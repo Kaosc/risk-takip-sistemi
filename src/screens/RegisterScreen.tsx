@@ -64,7 +64,7 @@ export default function RegisterScreen() {
 				contentContainerStyle={styles.form}
 			>
 				<Image
-					source={darkMode ? require("../assets/logo-transparent-white.png") : require("../assets/logo-transparent-black.png")}
+					source={require("../assets/logo.png")}
 					style={styles.logo}
 				/>
 

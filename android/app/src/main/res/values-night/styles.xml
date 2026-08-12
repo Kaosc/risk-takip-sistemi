@@ -16,7 +16,7 @@
     <item name="android:navigationBarColor">@color/colorPrimary</item>
     <item name="android:statusBarColor">@color/colorPrimary</item>
     <item name="bootSplashBackground">@color/colorPrimary</item>
-    <item name="bootSplashLogo">@drawable/logob</item>
+    <item name="bootSplashLogo">@drawable/splashscreen_logo</item>
     <item name="postBootSplashTheme">@style/AppTheme</item>
     <item name="android:windowLightStatusBar">false</item>
     <item name="android:windowLightNavigationBar">false</item>

@@ -171,7 +171,7 @@ export default function LoginScreen() {
 				showsVerticalScrollIndicator={false}
 			>
 				<Image
-					source={darkMode ? require("../assets/logo-transparent-white.png") : require("../assets/logo-transparent-black.png")}
+					source={require("../assets/logo.png")}
 					style={styles.logo}
 				/>
 
