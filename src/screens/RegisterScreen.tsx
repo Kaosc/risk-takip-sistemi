@@ -9,7 +9,7 @@ import { Image } from "expo-image"
 import ThemedButton from "../components/ui/ThemedButton"
 import ThemedText from "../components/ui/ThemedText"
 
-import { registerMember } from "../lib/firebase/auth"
+import { register } from "../lib/firebase/auth"
 import { Theme } from "../utils/theme"
 
 type RegisterFormData = {
@@ -48,7 +48,7 @@ export default function RegisterScreen() {
 		setIsSubmitting(true)
 		setFirebaseError("")
 
-		await registerMember(data.email, data.password)
+		await register(data.email, data.password)
 		navigation.goBack()
 
 		setIsSubmitting(false)

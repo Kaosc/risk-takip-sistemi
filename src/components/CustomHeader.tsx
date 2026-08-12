@@ -5,8 +5,6 @@ import { useSelector } from "react-redux"
 import ThemedIcon from "./ui/ThemedIcon"
 import ThemedText from "./ui/ThemedText"
 
-import { moderateScale } from "../utils/responsive"
-
 interface CustomHeaderProps {
 	title?: string
 	rightComponent?: React.ReactNode
@@ -16,7 +14,14 @@ interface CustomHeaderProps {
 	showBackButton?: boolean
 }
 
-export default function CustomHeader({ title, rightComponent, onBackPress, relative = true, fontSize, showBackButton = true }: CustomHeaderProps) {
+export default function CustomHeader({
+	title,
+	rightComponent,
+	onBackPress,
+	relative = true,
+	fontSize,
+	showBackButton = true,
+}: CustomHeaderProps) {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const navigation = useNavigation()
 	const styles = createStyles(darkMode, relative)
@@ -74,7 +79,7 @@ const createStyles = (darkMode: boolean, relative?: boolean) =>
 			top: 0,
 			left: 0,
 			right: 0,
-			height: moderateScale(56),
+			height: 56,
 			zIndex: 1000,
 			backgroundColor: darkMode ? "#000" : "#fff",
 			borderBottomWidth: 1,
@@ -89,8 +94,8 @@ const createStyles = (darkMode: boolean, relative?: boolean) =>
 			height: 60,
 		},
 		backButton: {
-			width: moderateScale(40),
-			height: moderateScale(40),
+			width: 40,
+			height: 40,
 			justifyContent: "center",
 			borderRadius: 20,
 		},
@@ -102,7 +107,7 @@ const createStyles = (darkMode: boolean, relative?: boolean) =>
 			letterSpacing: 0.5,
 		},
 		rightContainer: {
-			width: moderateScale(40),
+			width: 40,
 			alignItems: "center",
 			justifyContent: "center",
 		},

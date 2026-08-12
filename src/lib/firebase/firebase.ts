@@ -12,11 +12,11 @@ export default class FirebaseHandler {
 		provider.configure({
 			android: {
 				provider: __DEV__ ? "debug" : "playIntegrity",
-				debugToken: "AAE0A50C-5A0B-46C1-B6A2-2ADA34BD4D69",
+				debugToken: "99E55F93-AF0F-4396-B7DF-B367498181C6",
 			},
 			apple: {
 				provider: __DEV__ ? "debug" : "appAttestWithDeviceCheckFallback",
-				debugToken: "648EAA8D-EEA2-4B91-8566-9667E5B1CA18",
+				debugToken: "",
 			},
 		})
 

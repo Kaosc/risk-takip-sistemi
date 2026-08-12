@@ -1,34 +1,25 @@
 import i18next from "i18next"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
 import { useDispatch, useSelector } from "react-redux"
-import { useNavigation } from "@react-navigation/native"
 
 import ThemedIcon from "../components/ui/ThemedIcon"
 import ThemedText from "../components/ui/ThemedText"
 import CustomHeader from "../components/CustomHeader"
 
-import { clearUserAuth, getIsThemeAuto } from "../utils/storage"
+import { getIsThemeAuto } from "../utils/storage"
 import { setSettings } from "../store/features/settingsSlice"
 import toggleTheme from "../utils/toggleTheme"
 
-import { deleteMemberAccount } from "../lib/firebase/firestore/member"
-import { deleteCurrentAuthAccount } from "../lib/firebase/auth"
-
-import { logout } from "../store/features/authSlice"
 import { AllIconNames } from "../types/icon"
 import { Theme } from "../utils/theme"
 import app from "../../app.json"
 
 export default function SettingsScreen() {
-	const navigation = useNavigation() as any
 	const { darkMode, lang } = useSelector((state: RootState) => state.settings)
 	const dispatch = useDispatch()
-	const { uid, role } = useSelector((state: RootState) => state.auth)
 	const { t } = useTranslation()
-
-	const theme = Theme[darkMode ? "dark" : "light"]
 
 	const styles = createStyles(darkMode)
 
@@ -44,49 +35,6 @@ export default function SettingsScreen() {
 		const newLang = lang === "en" ? "tr" : "en"
 		i18next.changeLanguage(newLang)
 		dispatch(setSettings({ lang: newLang }))
-	}
-
-	const handleDeleteAccount = async () => {
-		if (!uid) return
-		const isMemberDocDeleted = await deleteMemberAccount(uid)
-
-		if (isMemberDocDeleted) {
-			const authDeleted = await deleteCurrentAuthAccount()
-
-			if (authDeleted) {
-				dispatch(logout())
-				clearUserAuth()
-
-				toast.show(t("accountDeleted"), {
-					type: "success",
-					duration: 10000,
-				})
-
-				navigation.reset({
-					index: 0,
-					routes: [{ name: "AuthStack" }],
-				})
-			}
-		}
-	}
-
-	const deleteAlert = () => {
-		Alert.alert(
-			t("deleteMyAccount"),
-			t("deleteAccountConfirmation"),
-
-			[
-				{
-					text: t("cancel"),
-					style: "cancel",
-				},
-				{
-					text: t("delete"),
-					style: "destructive",
-					onPress: handleDeleteAccount,
-				},
-			],
-		)
 	}
 
 	//////////////////////////// RENDER ////////////////////////////
@@ -164,38 +112,6 @@ export default function SettingsScreen() {
 						<ThemedText style={styles.settingText}>{app.expo.runtimeVersion}</ThemedText>
 					</View>
 				</View>
-
-				{role === "MEMBER" ? (
-					<>
-						<Title title={t("dangerZone")} />
-
-						<View style={styles.dangerZoneCard}>
-							<View style={{ flexDirection: "row", alignItems: "center", gap: 13, flex: 1 }}>
-								<ThemedIcon
-									name="alert-octagon"
-									size={35}
-									color={theme.red.foreground}
-								/>
-								<View style={{ flex: 1 }}>
-									<ThemedText style={styles.dangerText}>{t("dangerZoneDescription")}</ThemedText>
-								</View>
-							</View>
-							<TouchableOpacity
-								style={styles.dangerButton}
-								onPress={deleteAlert}
-							>
-								<ThemedIcon
-									name="delete"
-									size={20}
-									color={theme.red.foreground}
-								/>
-								<ThemedText style={styles.dangerButtonText}>{t("deleteMyAccount")}</ThemedText>
-							</TouchableOpacity>
-						</View>
-					</>
-				) : (
-					<></>
-				)}
 			</ScrollView>
 		</>
 	)

@@ -5,13 +5,10 @@ export const storage = createMMKV()
 export const storeAutoTheme = () => storage.set("autoTheme", true)
 export const getIsThemeAuto = () => storage.getBoolean("autoTheme")
 
-export const storeDontShowAgain = async (key: string) => storage.set(key, true)
-export const getDontShowAgain = (key: string) => storage.contains(key)
-
 export const storeSettings = async (settings: Settings) => storage.set("settings", JSON.stringify(settings))
 export const getSettings = (): Settings => JSON.parse(storage.getString("settings") || "null")
 
-export const setStaffCredentials = (email: string, password: string) => {
+export const storeStaffCredentials = (email: string, password: string) => {
 	storage.set("staffEmail", email)
 	storage.set("staffPassword", password)
 }
@@ -26,14 +23,6 @@ export const getStaffCredentials = (): { email: string; password: string } | nul
 export const clearStaffCredentials = () => {
 	storage.remove("staffEmail")
 	storage.remove("staffPassword")
-}
-
-export const storeRole = (role: UserRole) => {
-	storage.set("role", role)
-}
-
-export const storeUserAuth = (auth: UserAuth) => {
-	storage.set("auth", JSON.stringify(auth))
 }
 
 export const clearUserAuth = () => {

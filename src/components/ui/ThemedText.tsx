@@ -2,8 +2,6 @@ import { memo } from "react"
 import { StyleSheet, Text, TextProps } from "react-native"
 import { useSelector } from "react-redux"
 
-import { moderateFontScale } from "../../utils/responsive"
-
 interface ThemedTextProps extends TextProps {
 	color?: string
 	disableDeviceFontScaling?: boolean
@@ -24,7 +22,7 @@ function ThemedText(props: ThemedTextProps) {
 				props?.style,
 				props?.color && { color: props?.color },
 				{
-					fontSize: originalFontSize ? moderateFontScale(originalFontSize) : moderateFontScale(14),
+					fontSize: originalFontSize ? originalFontSize : 14,
 				},
 			]}
 			adjustsFontSizeToFit={props?.ellipsizeMode ? false : true}

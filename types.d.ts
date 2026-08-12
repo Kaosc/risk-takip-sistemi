@@ -48,7 +48,7 @@ type ConsentValues = {
 ///////////////////////////////////////////////////
 
 
-type UserRole = "ADMIN" | "STAFF"
+type UserRole = "ADMIN" | "STAFF" | "MEMBER"
 
 type FieldValue = import("@react-native-firebase/firestore").FieldValue
 type FirebaseTimestamp = import("@react-native-firebase/firestore").Timestamp
@@ -58,7 +58,7 @@ interface UserAuth {
 	password: string
 }
 
-interface StaffUser {
+interface User {
 	uid: string
 	email: string
 	role: UserRole

@@ -3,13 +3,13 @@ import { COLLECTIONS } from "../enums"
 
 const db = getFirestore()
 
-export const getStaffUserById = async (uid: string): Promise<StaffUser | null> => {
+export const getStaffUserById = async (uid: string): Promise<User | null> => {
 	try {
 		const docRef = doc(db, COLLECTIONS.USERS, uid)
 		const docSnap = await getDoc(docRef)
 
 		if (docSnap.exists()) {
-			const data = docSnap.data() as StaffUser
+			const data = docSnap.data() as User
 			return data
 		}
 
@@ -20,7 +20,7 @@ export const getStaffUserById = async (uid: string): Promise<StaffUser | null> =
 	}
 }
 
-export const addStaff = async (staffData: StaffUser): Promise<boolean> => {
+export const addUser = async (staffData: User): Promise<boolean> => {
 	try {
 		await setDoc(doc(db, COLLECTIONS.USERS, staffData.uid), staffData)
 		return true

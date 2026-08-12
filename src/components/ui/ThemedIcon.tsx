@@ -4,7 +4,6 @@ import { useSelector } from "react-redux"
 import { StyleProp, TextStyle } from "react-native"
 
 import { AllIconNames, iconComponents } from "../../types/icon"
-import { moderateScale } from "../../utils/responsive"
 
 interface ThemedIconProps {
 	name: AllIconNames
@@ -21,7 +20,7 @@ function ThemedIcon(props: ThemedIconProps) {
 		<IconComponent
 			{...props}
 			name={props?.name as any}
-			size={moderateScale(props?.size || 24)}
+			size={props?.size || 24}
 			style={[
 				props?.style,
 				{

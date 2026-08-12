@@ -15,13 +15,14 @@ import { useTranslation } from "react-i18next"
 import { useMMKVObject, useMMKVString } from "react-native-mmkv"
 import { Image } from "expo-image"
 
-import { resetPassword, staffLogin, memberLogin } from "../lib/firebase/auth"
-import { setAuth } from "../store/features/authSlice"
-import { clearUserAuth, setStaffCredentials } from "../utils/storage"
-import { Theme } from "../utils/theme"
+import ThemedText from "../components/ui/ThemedText"
 import ThemedButton from "../components/ui/ThemedButton"
 import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
-import ThemedText from "../components/ui/ThemedText"
+
+import { resetPassword, login } from "../lib/firebase/auth"
+import { setAuth } from "../store/features/authSlice"
+import { clearUserAuth, storeStaffCredentials } from "../utils/storage"
+import { Theme } from "../utils/theme"
 
 export default function LoginScreen() {
 	const { darkMode } = useSelector((state: RootState) => state.settings)
@@ -35,7 +36,6 @@ export default function LoginScreen() {
 	const [userAuth] = useMMKVObject<UserAuth | undefined>("auth")
 	const [role] = useMMKVString("role")
 
-	const [isStaffLogin, setIsStaffLogin] = useState(false)
 	const [forgotPassword, setForgotPassword] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
 
@@ -45,15 +45,10 @@ export default function LoginScreen() {
 
 	useEffect(() => {
 		setTimeout(() => {
-			if (isStaffLogin) {
-				setEmail(process.env.EXPO_PUBLIC_ADMIN_EMAIL || "")
-				setPassword(process.env.EXPO_PUBLIC_ADMIN_PASSWORD || "")
-			} else {
-				setEmail(process.env.EXPO_PUBLIC_MEMBER_EMAIL || "")
-				setPassword(process.env.EXPO_PUBLIC_MEMBER_PASSWORD || "")
-			}
+			setEmail(process.env.EXPO_PUBLIC_ADMIN_EMAIL || "")
+			setPassword(process.env.EXPO_PUBLIC_ADMIN_PASSWORD || "")
 		}, 100)
-	}, [isStaffLogin])
+	}, [])
 
 	useEffect(() => {
 		autoLogin()
@@ -72,11 +67,7 @@ export default function LoginScreen() {
 
 			let user = null
 
-			if (role === "MEMBER") {
-				user = await memberLogin(email || "", password || "")
-			} else {
-				user = await staffLogin(email || "", password || "")
-			}
+			user = await login(email || "", password || "")
 
 			if (!user) {
 				setError(t("autoLoginFailed"))
@@ -84,7 +75,7 @@ export default function LoginScreen() {
 			}
 
 			dispatch(setAuth({ isAuthenticated: true, uid: user?.uid, email: user?.email, role: role }))
-			navigation.dispatch(StackActions.replace(role === "MEMBER" ? "MemberTabs" : "Tabs"))
+			navigation.dispatch(StackActions.replace("HomeStack"))
 		} catch (e) {
 			console.warn("App.tsx:50", e)
 			clearUserAuth()
@@ -125,23 +116,16 @@ export default function LoginScreen() {
 		setIsLoading(true)
 
 		try {
-			const result = isStaffLogin ? await staffLogin(email, password) : await memberLogin(email, password)
+			const result = await login(email, password)
 			const { uid, role } = result
-			const isNewMember = "isNewMember" in result ? result.isNewMember : false
 
 			dispatch(setAuth({ isAuthenticated: true, uid, email, role }))
+			storeStaffCredentials(email, password)
 
-			if (role === "ADMIN" || role === "STAFF") {
-				setStaffCredentials(email, password)
-			}
-
-			if (isNewMember && role === "MEMBER") {
-				navigation.navigate("MemberFormScreen", { isNewMember: true })
-			} else {
-				navigation.dispatch(StackActions.replace(role === "MEMBER" ? "MemberTabs" : "Tabs"))
-			}
+			navigation.dispatch(StackActions.replace("HomeStack"))
 		} catch (e: any) {
 			const errorMessage = e?.message || ""
+
 			if (errorMessage === t("memberExistsNoAccount") || errorMessage === t("emailNotVerified")) {
 				setError(errorMessage)
 			} else {
@@ -175,28 +159,8 @@ export default function LoginScreen() {
 					style={styles.logo}
 				/>
 
-				<ThemedText style={styles.title}>
-					{forgotPassword ? t("resetPasswordTitle") : isStaffLogin ? t("staffLogin") : t("memberLogin")}
-				</ThemedText>
+				<ThemedText style={styles.title}>{forgotPassword ? t("resetPasswordTitle") : t("login")}</ThemedText>
 
-				{!forgotPassword && (
-					<View style={styles.segmentedControl}>
-						<TouchableOpacity
-							style={[styles.segment, isStaffLogin && styles.segmentActive]}
-							activeOpacity={0.7}
-							onPress={() => setIsStaffLogin(true)}
-						>
-							<Text style={[styles.segmentText, isStaffLogin && styles.segmentTextActive]}>{t("staffLogin")}</Text>
-						</TouchableOpacity>
-						<TouchableOpacity
-							style={[styles.segment, !isStaffLogin && styles.segmentActive]}
-							activeOpacity={0.7}
-							onPress={() => setIsStaffLogin(false)}
-						>
-							<Text style={[styles.segmentText, !isStaffLogin && styles.segmentTextActive]}>{t("memberLogin")}</Text>
-						</TouchableOpacity>
-					</View>
-				)}
 				<TextInput
 					style={styles.input}
 					placeholder={t("email")}
@@ -239,7 +203,7 @@ export default function LoginScreen() {
 					<ThemedText style={styles.registerLinkText}>{forgotPassword ? t("backToLogin") : t("resetPassword")}</ThemedText>
 				</TouchableOpacity>
 
-				{!isStaffLogin && !forgotPassword && (
+				{!forgotPassword && (
 					<TouchableOpacity
 						style={styles.registerLink}
 						activeOpacity={0.7}
@@ -275,31 +239,6 @@ const createStyles = (darkMode: boolean) => {
 			fontWeight: "700",
 			marginBottom: 16,
 			textAlign: "center",
-		},
-		segmentedControl: {
-			flexDirection: "row",
-			borderWidth: 1,
-			borderColor: theme.border,
-			borderRadius: 8,
-			overflow: "hidden",
-			marginBottom: 24,
-		},
-		segment: {
-			flex: 1,
-			paddingVertical: 12,
-			alignItems: "center",
-			backgroundColor: "transparent",
-		},
-		segmentActive: {
-			backgroundColor: darkMode ? "#fff" : "#000",
-		},
-		segmentText: {
-			fontSize: 15,
-			fontWeight: "600",
-			color: darkMode ? "#fff" : "#000",
-		},
-		segmentTextActive: {
-			color: darkMode ? "#000" : "#fff",
 		},
 		input: {
 			borderWidth: 1,
