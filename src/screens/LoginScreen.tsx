@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import {
 	View,
 	Text,
@@ -10,7 +10,7 @@ import {
 	ScrollView,
 } from "react-native"
 import { useDispatch, useSelector } from "react-redux"
-import { useNavigation, NavigationProp, StackActions } from "@react-navigation/native"
+import { useNavigation, NavigationProp, StackActions, useFocusEffect } from "@react-navigation/native"
 import { useMMKVObject, useMMKVString } from "react-native-mmkv"
 import { Image } from "expo-image"
 
@@ -51,6 +51,12 @@ export default function LoginScreen() {
 	useEffect(() => {
 		autoLogin()
 	}, [])
+
+	useFocusEffect(
+		useCallback(() => {
+			setError("")
+		}, []),
+	)
 
 	const autoLogin = async () => {
 		try {
