@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Risk Track",
+    "slug": "risktrack",
+    "scheme": "risktrack",
+    "version": "1.0.0",
+    "runtimeVersion": "0.55.0",
+    "platforms": [
+      "android",
+      "ios"
+    ],
+    "developmentClient": {
+      "silentLaunch": true
+    },
+    "experiments": {
+      "reactCompiler": true
+    },
+    "plugins": [
+      "expo-image",
+      "expo-build-properties",
+      "expo-localization",
+      "expo-font",
+      "expo-web-browser",
+      "@react-native-community/datetimepicker"
+    ],
+    "ios": {
+      "bundleIdentifier": "com.Kaosc.risktrack"
+    },
+    "android": {
+      "package": "com.Kaosc.risktrack"
+    }
+  }
+}
