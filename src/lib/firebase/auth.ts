@@ -25,34 +25,26 @@ export const login = async (email: string, password: string) => {
 
 		if (!userDoc.exists()) {
 			await signOut(auth)
-			throw new Error("Kullanıcı kaydı bulunamadı. Lütfen kayıt olun.")
+			throw new Error()
 		}
 
 		const data = userDoc.data()
 		return { uid, email, role: data?.role as UserRole }
 	} catch (e: any) {
 		console.debug("[AUTH] loginUser:", e?.message || e)
-		const alert = (m: string) => toast.show(m, { duration: 6000, type: "danger" })
 
 		switch (e.code) {
 			case "auth/user-not-found":
-				alert("Kullanıcı bulunamadı. Lütfen kayıt olun.")
-				break
+				throw new Error("Kullanıcı bulunamadı. Lütfen kayıt olun.")
 			case "auth/wrong-password":
-				alert("Yanlış şifre. Lütfen tekrar deneyin.")
-				break
+				throw new Error("Yanlış şifre. Lütfen tekrar deneyin.")
 			case "auth/invalid-email":
-				alert("Geçersiz e-posta adresi. Lütfen geçerli bir e-posta adresi girin.")
-				break
+				throw new Error("Geçersiz e-posta adresi. Lütfen geçerli bir e-posta adresi girin.")
 			case "auth/too-many-requests":
-				alert("Çok fazla istek gönderildi. Lütfen biraz bekleyin.")
-				break
+				throw new Error("Çok fazla istek gönderildi. Lütfen biraz bekleyin.")
 			default:
-				alert("Giriş sırasında bir hata oluştu. Lütfen tekrar deneyin.")
-				break
+				throw new Error("Giriş sırasında bir hata oluştu. Lütfen tekrar deneyin.")
 		}
-
-		return null
 	}
 }
 

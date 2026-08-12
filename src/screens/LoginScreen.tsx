@@ -56,28 +56,15 @@ export default function LoginScreen() {
 		try {
 			setIsLoading(true)
 
-			if (!role || !userAuth) {
-				return
-			}
-
-			const email = userAuth?.email
-			const password = userAuth?.password
-
 			let user = null
-
-			user = await login(email || "", password || "")
-
-			if (!user) {
-				setError("Otomatik giriş başarısız. Lütfen bilgilerinizi kontrol edin.")
-				return
-			}
+			user = await login(userAuth?.email || "", userAuth?.password || "")
 
 			dispatch(setAuth({ isAuthenticated: true, uid: user?.uid, email: user?.email, role: role }))
 			navigation.dispatch(StackActions.replace("HomeStack"))
-		} catch (e) {
+		} catch (e: any) {
 			console.warn("App.tsx:50", e)
 			clearUserAuth()
-			setError("Otomatik giriş başarısız. Lütfen bilgilerinizi kontrol edin.")
+			setError(e?.message || "Otomatik giriş başarısız. Lütfen bilgilerinizi kontrol edin.")
 		} finally {
 			setIsLoading(false)
 		}
