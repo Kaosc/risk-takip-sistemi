@@ -57,3 +57,12 @@ interface UserAuth {
 	email: string
 	password: string
 }
+
+interface StaffUser {
+	uid: string
+	email: string
+	role: UserRole
+	name: string
+	createdAt: FirebaseTimestamp
+	updatedAt: FirebaseTimestamp
+}
