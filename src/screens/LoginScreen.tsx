@@ -11,7 +11,6 @@ import {
 } from "react-native"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigation, NavigationProp, StackActions } from "@react-navigation/native"
-import { useTranslation } from "react-i18next"
 import { useMMKVObject, useMMKVString } from "react-native-mmkv"
 import { Image } from "expo-image"
 
@@ -26,7 +25,6 @@ import { Theme } from "../utils/theme"
 
 export default function LoginScreen() {
 	const { darkMode } = useSelector((state: RootState) => state.settings)
-	const { t } = useTranslation()
 
 	const dispatch = useDispatch<any>()
 	const navigation = useNavigation() as NavigationProp<any>
@@ -70,7 +68,7 @@ export default function LoginScreen() {
 			user = await login(email || "", password || "")
 
 			if (!user) {
-				setError(t("autoLoginFailed"))
+				setError("Otomatik giriş başarısız. Lütfen bilgilerinizi kontrol edin.")
 				return
 			}
 
@@ -79,7 +77,7 @@ export default function LoginScreen() {
 		} catch (e) {
 			console.warn("App.tsx:50", e)
 			clearUserAuth()
-			setError(t("autoLoginFailed"))
+			setError("Otomatik giriş başarısız. Lütfen bilgilerinizi kontrol edin.")
 		} finally {
 			setIsLoading(false)
 		}
@@ -87,7 +85,7 @@ export default function LoginScreen() {
 
 	const handleForgotPassword = async () => {
 		if (!email.trim()) {
-			setError(t("emailRequired"))
+			setError("E-posta alanı zorunludur.")
 			return
 		}
 
@@ -108,7 +106,7 @@ export default function LoginScreen() {
 		}
 
 		if (!email.trim() || !password.trim()) {
-			setError(t("emailAndPasswordRequired"))
+			setError("E-posta ve şifre alanları zorunludur.")
 			return
 		}
 
@@ -117,6 +115,12 @@ export default function LoginScreen() {
 
 		try {
 			const result = await login(email, password)
+
+			if (!result) {
+				setError("Giriş başarısız. Lütfen bilgilerinizi kontrol edin.")
+				return
+			}
+
 			const { uid, role } = result
 
 			dispatch(setAuth({ isAuthenticated: true, uid, email, role }))
@@ -124,13 +128,7 @@ export default function LoginScreen() {
 
 			navigation.dispatch(StackActions.replace("HomeStack"))
 		} catch (e: any) {
-			const errorMessage = e?.message || ""
-
-			if (errorMessage === t("memberExistsNoAccount") || errorMessage === t("emailNotVerified")) {
-				setError(errorMessage)
-			} else {
-				setError(t("loginFailed"))
-			}
+			setError(e?.message || "Giriş başarısız. Lütfen bilgilerinizi kontrol edin.")
 		} finally {
 			setIsLoading(false)
 		}
@@ -159,11 +157,11 @@ export default function LoginScreen() {
 					style={styles.logo}
 				/>
 
-				<ThemedText style={styles.title}>{forgotPassword ? t("resetPasswordTitle") : t("login")}</ThemedText>
+				<ThemedText style={styles.title}>{forgotPassword ? "Şifre Sıfırla" : "Giriş Yap"}</ThemedText>
 
 				<TextInput
 					style={styles.input}
-					placeholder={t("email")}
+					placeholder={"E-posta"}
 					placeholderTextColor="#888"
 					value={email}
 					onChangeText={setEmail}
@@ -174,7 +172,7 @@ export default function LoginScreen() {
 				{!forgotPassword && (
 					<TextInput
 						style={styles.input}
-						placeholder={t("password")}
+						placeholder={"Şifre"}
 						placeholderTextColor="#888"
 						value={password}
 						onChangeText={setPassword}
@@ -191,7 +189,7 @@ export default function LoginScreen() {
 					{isLoading ? (
 						<ActivityIndicator color={darkMode ? "#000" : "#fff"} />
 					) : (
-						<ThemedText style={styles.buttonText}>{forgotPassword ? t("sendResetEmail") : t("login")}</ThemedText>
+						<ThemedText style={styles.buttonText}>{forgotPassword ? "Şifre Sıfırla" : "Giriş Yap"}</ThemedText>
 					)}
 				</ThemedButton>
 
@@ -200,7 +198,7 @@ export default function LoginScreen() {
 					activeOpacity={0.7}
 					onPress={() => setForgotPassword(!forgotPassword)}
 				>
-					<ThemedText style={styles.registerLinkText}>{forgotPassword ? t("backToLogin") : t("resetPassword")}</ThemedText>
+					<ThemedText style={styles.registerLinkText}>{forgotPassword ? "Giriş Sayfasına Dön" : "Şifremi Unuttum"}</ThemedText>
 				</TouchableOpacity>
 
 				{!forgotPassword && (
@@ -209,7 +207,7 @@ export default function LoginScreen() {
 						activeOpacity={0.7}
 						onPress={() => navigation.navigate("RegisterScreen")}
 					>
-						<ThemedText style={styles.registerLinkText}>{t("register")}</ThemedText>
+						<ThemedText style={styles.registerLinkText}>{"Kayıt Ol"}</ThemedText>
 					</TouchableOpacity>
 				)}
 			</ScrollView>

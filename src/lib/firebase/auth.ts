@@ -1,5 +1,6 @@
 import {
 	createUserWithEmailAndPassword,
+	deleteUser,
 	getAuth,
 	sendEmailVerification,
 	sendPasswordResetEmail,
@@ -7,7 +8,6 @@ import {
 	signOut,
 } from "@react-native-firebase/auth"
 import { getFirestore, doc, getDoc } from "@react-native-firebase/firestore"
-import { t } from "i18next"
 
 import { COLLECTIONS } from "./enums"
 import { addUser } from "./firestore/users"
@@ -15,47 +15,76 @@ import { addUser } from "./firestore/users"
 const auth = getAuth()
 const db = getFirestore()
 
-export const generatePassword = () => {
-	const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-	let password = ""
-	for (let i = 0; i < 8; i++) {
-		password += chars.charAt(Math.floor(Math.random() * chars.length))
-	}
-	return password
-}
-
 export const login = async (email: string, password: string) => {
-	const userCredential = await signInWithEmailAndPassword(auth, email, password)
-	const uid = userCredential.user.uid
+	try {
+		const userCredential = await signInWithEmailAndPassword(auth, email, password)
+		const uid = userCredential.user.uid
 
-	const usersRef = doc(db, COLLECTIONS.USERS, uid)
-	const userDoc = await getDoc(usersRef)
+		const usersRef = doc(db, COLLECTIONS.USERS, uid)
+		const userDoc = await getDoc(usersRef)
 
-	if (!userDoc.exists()) {
-		await signOut(auth)
-		throw new Error(t("staffRecordNotFound"))
+		if (!userDoc.exists()) {
+			await signOut(auth)
+			throw new Error("Kullanıcı kaydı bulunamadı. Lütfen kayıt olun.")
+		}
+
+		const data = userDoc.data()
+		return { uid, email, role: data?.role as UserRole }
+	} catch (e: any) {
+		console.debug("[AUTH] loginUser:", e?.message || e)
+		const alert = (m: string) => toast.show(m, { duration: 6000, type: "danger" })
+
+		switch (e.code) {
+			case "auth/user-not-found":
+				alert("Kullanıcı bulunamadı. Lütfen kayıt olun.")
+				break
+			case "auth/wrong-password":
+				alert("Yanlış şifre. Lütfen tekrar deneyin.")
+				break
+			case "auth/invalid-email":
+				alert("Geçersiz e-posta adresi. Lütfen geçerli bir e-posta adresi girin.")
+				break
+			case "auth/too-many-requests":
+				alert("Çok fazla istek gönderildi. Lütfen biraz bekleyin.")
+				break
+			default:
+				alert("Giriş sırasında bir hata oluştu. Lütfen tekrar deneyin.")
+				break
+		}
+
+		return null
 	}
-
-	const data = userDoc.data()
-	return { uid, email, role: data?.role as UserRole }
 }
 
-export const register = async (email: string, password: string) => {
+export const register = async (email: string, password: string, name: string) => {
 	let uid: string | null = null
-
 	try {
 		const credential = await createUserWithEmailAndPassword(auth, email, password)
-		await addUser({
+		console.log(credential)
+
+		if (!credential.user) {
+			throw new Error("Hesap oluşturulamadı. Lütfen tekrar deneyin.")
+		}
+
+		const addUserResult = await addUser({
 			uid: credential.user.uid,
 			email: credential.user.email || "",
 			role: "MEMBER",
-			name: "",
+			name: name,
 			createdAt: new Date() as unknown as FirebaseTimestamp,
 			updatedAt: new Date() as unknown as FirebaseTimestamp,
 		})
+
+		if (!addUserResult) {
+			await deleteUser(credential.user)
+			await signOut(auth)
+			toast.show("Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.", { duration: 10000, type: "danger" })
+			return null
+		}
+
 		await sendEmailVerification(credential.user)
 		await signOut(auth)
-		toast.show(t("registerSuccess"), { duration: 10000, type: "success" })
+		toast.show("Kayıt başarılı. E-posta adresinizi doğrulayın.", { duration: 10000, type: "success" })
 		uid = credential.user.uid
 	} catch (error: any) {
 		console.debug("[AUTH] registerMember:", error?.message || error)
@@ -63,16 +92,16 @@ export const register = async (email: string, password: string) => {
 
 		switch (error.code) {
 			case "auth/email-already-in-use":
-				alert(t("emailAlreadyInUse"))
+				alert("Bu e-posta adresi zaten kullanılıyor. Lütfen başka bir e-posta adresi deneyin.")
 				break
 			case "auth/invalid-email":
-				alert(t("invalidEmail"))
+				alert("Geçersiz e-posta adresi. Lütfen geçerli bir e-posta adresi girin.")
 				break
 			case "auth/weak-password":
-				alert(t("weakPassword"))
+				alert("Zayıf şifre. Lütfen en az 6 karakter uzunluğunda bir şifre girin.")
 				break
 			default:
-				alert(t("registrationError"))
+				alert("Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.")
 				break
 		}
 	}
@@ -83,11 +112,11 @@ export const register = async (email: string, password: string) => {
 export const resetPassword = async (email: string): Promise<boolean> => {
 	try {
 		await sendPasswordResetEmail(auth, email)
-		toast.show(t("resetEmailSent"), { duration: 6000, type: "success" })
+		toast.show("Şifre sıfırlama e-postası gönderildi.", { duration: 6000, type: "success" })
 		return true
 	} catch (error: any) {
 		console.debug("[AUTH] sendPasswordResetEmail:", error?.message || error)
-		toast.show(t("resetEmailError"), { duration: 10000, type: "danger" })
+		toast.show("Şifre sıfırlama e-postası gönderilirken bir hata oluştu.", { duration: 10000, type: "danger" })
 		return false
 	}
 }

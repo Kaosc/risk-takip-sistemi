@@ -22,6 +22,7 @@ function ToastNotification() {
 const styles = StyleSheet.create({
 	text: {
 		fontSize: 17,
+		textAlign: "center",
 	},
 })
 
