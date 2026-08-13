@@ -71,7 +71,7 @@ interface User {
 // Tip güvenliği (Type Safety) için statik değerleri İngilizce yapıyoruz
 type RiskType = "Risk" | "Accident" | "Near Miss"
 type RiskSeverity = "Low" | "Medium" | "High" | "Critical"
-type RiskStatus = "New" | "Under Review" | "In Progress" | "Pending Verification" | "Completed" | "Closed"
+type RiskStatus = "New" | "In Progress" | "Pending Verification" | "Closed"
 
 interface Risk {
 	id: string // Firebase Document ID
@@ -87,6 +87,7 @@ interface Risk {
 	createdBy: string
 	createdAt: FirebaseTimestamp
 	updatedAt: FirebaseTimestamp
+	status: RiskStatus
 
 	// --- EXTRA FIELDS FOR ACCIDENT (Sadece "type === 'Accident'" ise) ---
 	accidentDetails?: {
@@ -96,7 +97,6 @@ interface Risk {
 	}
 
 	// --- 2. ASSESSMENT & ASSIGNMENT STAGE (İSG Uzmanı Doldurur) ---
-	status: RiskStatus
 	assignedTo?: string // Görev atanan personelin UID'si
 	taskDescription?: string // Yapılması istenen düzeltici faaliyet
 	dueDate?: FirebaseTimestamp // Termin tarihi

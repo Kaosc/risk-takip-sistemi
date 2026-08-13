@@ -227,6 +227,7 @@ export default function MemberFormScreen() {
 				description: data.description,
 				severity: data.severity,
 				images: [],
+				status: "New",
 			}
 
 			// Eğer tür "Accident" ise, kazaya özel alanları da ekliyoruz
@@ -503,7 +504,11 @@ export default function MemberFormScreen() {
 							<ActivityIndicator color={darkMode ? "#000" : "#fff"} />
 						) : (
 							<View style={styles.submitContent}>
-								<ThemedIcon name="send" size={20} color={darkMode ? "#000" : "#fff"} />
+								<ThemedIcon
+									name="send"
+									size={20}
+									color={darkMode ? "#000" : "#fff"}
+								/>
 								<ThemedText style={styles.submitText}>Gönder</ThemedText>
 							</View>
 						)}
