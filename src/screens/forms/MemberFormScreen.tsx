@@ -1,5 +1,5 @@
 import { useRef, useState } from "react"
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Switch } from "react-native"
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { useSelector } from "react-redux"
 import { useForm, Controller } from "react-hook-form"
 import { Image } from "expo-image"
@@ -15,7 +15,8 @@ import ThemedButton from "../../components/ui/ThemedButton"
 import ThemedBottomSheet from "../../components/ui/ThemedBottomSheet"
 import GradientCard from "../../components/ui/GradientCard"
 import ThemedIcon from "../../components/ui/ThemedIcon"
-import { addRisk } from "../../lib/firebase/firestore/risks"
+import { addRisk, deleteRisk, updateRisk } from "../../lib/firebase/firestore/risks"
+import { uploadImages } from "../../lib/firebase/storage"
 
 // --- TİPLER VE OPSİYONLAR ---
 
@@ -106,6 +107,7 @@ export default function MemberFormScreen() {
 	const [images, setImages] = useState<string[]>([])
 	const [isPicking, setIsPicking] = useState(false)
 	const [pickerError, setPickerError] = useState("")
+	const [isSubmitting, setIsSubmitting] = useState(false)
 
 	const {
 		control,
@@ -213,38 +215,66 @@ export default function MemberFormScreen() {
 	//////////////////////////// SUBMIT ////////////////////////////
 
 	const onSubmit = async (data: MemberFormData) => {
-		// Form verisini senin Risk interface'ine uygun hale getiriyoruz
-		let formattedData: Partial<Risk> = {
-			type: data.type,
-			category: data.category,
-			location: data.location,
-			description: data.description,
-			severity: data.severity,
-			images: images,
-		}
+		if (isSubmitting) return
+		setIsSubmitting(true)
 
-		// Eğer tür "Accident" ise, kazaya özel alanları da ekliyoruz
-		if (data.type === "Accident" && data.accidentDetails) {
-			formattedData = {
-				...formattedData,
-				accidentDetails: {
-					involvedPersons: data.accidentDetails.involvedPersons
-						.split(",")
-						.map((p) => p.trim())
-						.filter(Boolean),
-					injuryStatus: data.accidentDetails.injuryStatus,
-					firstAidProvided: data.accidentDetails.firstAidProvided,
-				},
+		try {
+			// Form verisini senin Risk interface'ine uygun hale getiriyoruz
+			let formattedData: Partial<Risk> = {
+				type: data.type,
+				category: data.category,
+				location: data.location,
+				description: data.description,
+				severity: data.severity,
+				images: [],
 			}
-		}
 
-		const res = await addRisk(formattedData)
+			// Eğer tür "Accident" ise, kazaya özel alanları da ekliyoruz
+			if (data.type === "Accident" && data.accidentDetails) {
+				formattedData = {
+					...formattedData,
+					accidentDetails: {
+						involvedPersons: data.accidentDetails.involvedPersons
+							.split(",")
+							.map((p) => p.trim())
+							.filter(Boolean),
+						injuryStatus: data.accidentDetails.injuryStatus,
+						firstAidProvided: data.accidentDetails.firstAidProvided,
+					},
+				}
+			}
 
-		if (res.success) {
-			toast.show("Kayıt başarıyla gönderildi!", { duration: 6000, type: "success" })
-			navigation.navigate("HomeStack", { screen: "HomeScreen" })
-		} else {
-			toast.show(`Kayıt gönderilemedi: ${res.error}`, { duration: 10000, type: "danger" })
+			// 1) Önce risk dokümanını Firestore'a ekle
+			const res = await addRisk(formattedData)
+			if (!res.success || !res.id) {
+				Alert.alert("Kayıt Gönderilmedi", "Risk kaydı oluşturulamadı. Lütfen tekrar deneyin.")
+				return
+			}
+
+			// 2) Görsel varsa Firebase Storage'a yükle
+			if (images.length > 0) {
+				const uploadResult = await uploadImages(images, `risks/${res.id}`)
+
+				// Yükleme başarısızsa eklediğimiz dokümanı geri sil ve kullanıcı tekrar denesin
+				if (!uploadResult.success || !uploadResult.urls) {
+					await deleteRisk(res.id)
+					Alert.alert("Kayıt Gönderilmedi", "Görseller yüklenemedi. Lütfen tekrar deneyin.")
+					return
+				}
+
+				// Yüklenen URL'leri dokümana kaydet
+				await updateRisk(res.id, { images: uploadResult.urls })
+			}
+
+			// 3) Başarılı -> kullanıcıyı bilgilendir ve ana ekrana dön
+			Alert.alert("Başarılı", "Kaydınız başarıyla gönderildi.", [
+				{ text: "Tamam", onPress: () => navigation.navigate("HomeStack", { screen: "HomeScreen" }) },
+			])
+		} catch (error: any) {
+			console.error("Kayıt gönderilirken hata oluştu:", error)
+			Alert.alert("Kayıt Gönderilmedi", "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.")
+		} finally {
+			setIsSubmitting(false)
 		}
 	}
 
@@ -465,12 +495,19 @@ export default function MemberFormScreen() {
 					</View>
 
 					<ThemedButton
-						text="Gönder"
-						icon="send"
-						iconSize={20}
 						onPress={handleSubmit(onSubmit)}
+						disabled={isSubmitting}
 						style={styles.submitButton}
-					/>
+					>
+						{isSubmitting ? (
+							<ActivityIndicator color={darkMode ? "#000" : "#fff"} />
+						) : (
+							<View style={styles.submitContent}>
+								<ThemedIcon name="send" size={20} color={darkMode ? "#000" : "#fff"} />
+								<ThemedText style={styles.submitText}>Gönder</ThemedText>
+							</View>
+						)}
+					</ThemedButton>
 				</GradientCard>
 			</ScrollView>
 
@@ -614,6 +651,16 @@ const createStyles = (darkMode: boolean) => {
 			backgroundColor: "red",
 			borderWidth: 2,
 			borderColor: darkMode ? "#000" : "#fff",
+		},
+		submitContent: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: 8,
+		},
+		submitText: {
+			fontSize: 16,
+			fontWeight: "bold",
+			color: darkMode ? "#000" : "#fff",
 		},
 		submitButton: {
 			marginTop: 6,
