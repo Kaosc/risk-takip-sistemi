@@ -69,8 +69,8 @@ interface User {
 }
 
 // Tip güvenliği (Type Safety) için statik değerleri İngilizce yapıyoruz
-type RiskType = "Risk" | "Accident" | "Near Miss"
-type RiskSeverity = "Low" | "Medium" | "High" | "Critical"
+type RiskType = "risk" | "accident" | "nearmiss"
+type RiskSeverity = "low" | "medium" | "high" | "critical"
 type RiskStatus = "new" | "pending" | "inprogress" | "completed" | "closed"
 
 interface Risk {

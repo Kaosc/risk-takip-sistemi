@@ -11,7 +11,7 @@ import CustomHeader from "../components/CustomHeader"
 
 import { Theme } from "../utils/theme"
 import { logout } from "../lib/firebase/auth"
-import { clearUserAuth } from "../utils/storage"
+import { clearUser } from "../utils/storage"
 
 const getInitials = (name?: string) =>
 	name
@@ -119,7 +119,7 @@ export default function HomeScreen() {
 					iconSize={22}
 					onPress={() => {
 						logout()
-						clearUserAuth()
+						clearUser()
 						navigation.reset({
 							index: 0,
 							routes: [{ name: "AuthStack" }],

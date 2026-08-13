@@ -113,11 +113,11 @@ export default function MemberFormScreen() {
 		formState: { errors },
 	} = useForm<MemberFormData>({
 		defaultValues: {
-			type: "Risk",
+			type: "risk",
 			category: "",
 			location: "",
 			description: "",
-			severity: "Medium",
+			severity: "medium",
 			accidentDetails: {
 				involvedPersons: "",
 				injuryStatus: "",
@@ -223,7 +223,7 @@ export default function MemberFormScreen() {
 				status: "new",
 			}
 
-			if (data.type === "Accident" && data.accidentDetails) {
+			if (data.type === "accident" && data.accidentDetails) {
 				formattedData = {
 					...formattedData,
 					accidentDetails: {
@@ -256,7 +256,7 @@ export default function MemberFormScreen() {
 			}
 
 			Alert.alert("Başarılı", "Kaydınız başarıyla gönderildi.", [
-				{ text: "Tamam", onPress: () => navigation.navigate("HomeStack", { screen: "HomeScreen" }) },
+				{ text: "Tamam", onPress: () => navigation.navigate("TabNavigator", { screen: "HomeStack" }) },
 			])
 		} catch (error: any) {
 			console.error("Kayıt gönderilirken hata oluştu:", error)
@@ -294,7 +294,7 @@ export default function MemberFormScreen() {
 						)}
 					/>
 
-					{selectedType === "Accident" && (
+					{selectedType === "accident" && (
 						<View style={styles.dynamicSection}>
 							<ThemedText style={styles.sectionTitle}>Kaza Detayları</ThemedText>
 

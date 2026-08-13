@@ -20,14 +20,11 @@ export const getStaffCredentials = (): { email: string; password: string } | nul
 	return null
 }
 
-export const clearStaffCredentials = () => {
-	storage.remove("staffEmail")
-	storage.remove("staffPassword")
-}
-
-export const clearUserAuth = () => {
+export const clearUser = () => {
 	storage.remove("auth")
 	storage.remove("role")
+	storage.remove("staffEmail")
+	storage.remove("staffPassword")
 }
 
 /////////////////////////////////// DELETE ////////////////////////////////

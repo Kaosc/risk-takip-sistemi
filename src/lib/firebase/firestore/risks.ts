@@ -58,7 +58,6 @@ export const updateRisk = async (id: string, data: Partial<Risk>) => {
 		await updateDoc(doc(db, COLLECTIONS.RISKS, id), {
 			...data,
 			updatedAt: serverTimestamp(),
-			completedAt: serverTimestamp(),
 		})
 		return { success: true }
 	} catch (error: any) {

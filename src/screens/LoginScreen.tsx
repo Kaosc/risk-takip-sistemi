@@ -20,7 +20,7 @@ import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 
 import { resetPassword, login } from "../lib/firebase/auth"
 import { setAuth } from "../store/features/authSlice"
-import { clearUserAuth } from "../utils/storage"
+import { clearUser } from "../utils/storage"
 import { Theme } from "../utils/theme"
 
 export default function LoginScreen() {
@@ -74,7 +74,7 @@ export default function LoginScreen() {
 			navigation.dispatch(StackActions.replace("TabNavigator"))
 		} catch (e: any) {
 			console.warn("App.tsx:50", e)
-			clearUserAuth()
+			clearUser()
 			setError(e?.message || "Otomatik giriş başarısız. Lütfen bilgilerinizi kontrol edin.")
 		} finally {
 			setIsLoading(false)
@@ -113,15 +113,15 @@ export default function LoginScreen() {
 
 		try {
 			const result = await login(email, password)
-
+			
 			if (!result) {
 				setError("Giriş başarısız. Lütfen bilgilerinizi kontrol edin.")
 				return
 			}
 
-			const { uid, role } = result
+			const { uid, role, name } = result
 
-			dispatch(setAuth({ isAuthenticated: true, uid, email, role }))
+			dispatch(setAuth({ isAuthenticated: true, uid, email, role, name }))
 
 			// Store user credentials for auto-login
 			setUserAuth({ email, password })

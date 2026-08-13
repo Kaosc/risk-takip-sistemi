@@ -18,9 +18,10 @@ import { safeTimestampToDateString } from "../utils/date"
 import { AllIconNames } from "../types/icon"
 import { Theme } from "../utils/theme"
 import { getStaffs } from "../lib/firebase/firestore/users"
-import { assignRiskToStaff, deleteRisk, updateRisk, updateStatus } from "../lib/firebase/firestore/risks"
+import { assignRiskToStaff, updateRisk, updateStatus } from "../lib/firebase/firestore/risks"
 import { uploadImages } from "../lib/firebase/storage"
 import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
+import { serverTimestamp } from "@react-native-firebase/firestore"
 
 const fallbackRisk: Risk = {
 	id: "",
@@ -197,7 +198,7 @@ export default function RiskDetailsScreen() {
 			}
 
 			// 2) Atama başarılıysa riskin durumunu "pending" yap
-			const statusResult = await updateStatus(risk.id, "pending")
+			const statusResult = await updateStatus(risk.id, "inprogress")
 
 			if (!statusResult.success) {
 				Alert.alert("Hata", "Görev atandı fakat durum güncellenemedi. Durumu manuel kontrol edin.")
@@ -298,7 +299,10 @@ export default function RiskDetailsScreen() {
 					return
 				}
 
-				await updateRisk(risk.id, { afterImages: uploadResult.urls })
+				await updateRisk(risk.id, {
+					afterImages: uploadResult.urls,
+					completedAt: serverTimestamp() as unknown as FirebaseTimestamp,
+				})
 			}
 
 			if (!res.success) {
@@ -383,28 +387,12 @@ export default function RiskDetailsScreen() {
 				)
 			}
 
-			if (risk.status === "pending") {
+			// info for admin to waiting for staff to complete the task
+			if (risk.status === "inprogress") {
 				return (
 					<GradientCard style={styles.card}>
-						<ThemedText style={styles.sectionTitle}>Doğrulama</ThemedText>
-
-						<ThemedText style={styles.fieldLabel}>Personelin Yüklediği Görseller</ThemedText>
-						<ThumbnailsRow images={risk.afterImages || []} />
-
-						<ThemedText style={styles.fieldLabel}>Tamamlanma Notu</ThemedText>
-						<ThemedText style={styles.description}>{risk.completionNotes || "-"}</ThemedText>
-
-						<ThemedButton
-							text="Approve & Close"
-							icon="check"
-							onPress={() => setStatus("closed")}
-						/>
-						<ThemedButton
-							text="Reject"
-							icon="close"
-							onPress={() => setStatus("new")}
-							style={styles.secondaryButton}
-						/>
+						<ThemedText style={styles.sectionTitle}>Görev Devam Ediyor</ThemedText>
+						<ThemedText style={styles.sectionHint}>Bu bildirimin görevi devam ediyor.</ThemedText>
 					</GradientCard>
 				)
 			}
@@ -436,7 +424,7 @@ export default function RiskDetailsScreen() {
 				return <ThemedActivityIndicator />
 			}
 
-			if (risk.status === "pending") {
+			if (risk.status === "inprogress") {
 				return (
 					<GradientCard style={styles.card}>
 						<ThemedText style={styles.sectionTitle}>Görevi Tamamla</ThemedText>
