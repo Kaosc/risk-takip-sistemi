@@ -10,7 +10,7 @@ import {
 import { getFirestore, doc, getDoc } from "@react-native-firebase/firestore"
 
 import { COLLECTIONS } from "./enums"
-import { addUser } from "./firestore/users"
+import { addUser, assignFCMTokenToUser } from "./firestore/users"
 
 const auth = getAuth()
 const db = getFirestore()
@@ -28,8 +28,10 @@ export const login = async (email: string, password: string) => {
 			throw new Error()
 		}
 
+		const fcmToken = await assignFCMTokenToUser()
+
 		const data = userDoc.data()
-		return { uid, email, role: data?.role as UserRole, name: data?.name as string }
+		return { uid, email, role: data?.role as UserRole, name: data?.name as string, fcmToken: fcmToken ?? null }
 	} catch (e: any) {
 		console.debug("[AUTH] loginUser:", e?.message || e)
 

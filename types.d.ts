@@ -64,6 +64,7 @@ interface User {
 	email: string
 	role: UserRole
 	name: string
+	fcmToken?: string | undefined
 	createdAt: FirebaseTimestamp
 	updatedAt: FirebaseTimestamp
 }
@@ -71,7 +72,7 @@ interface User {
 // Tip güvenliği (Type Safety) için statik değerleri İngilizce yapıyoruz
 type RiskType = "risk" | "accident" | "nearmiss"
 type RiskSeverity = "low" | "medium" | "high" | "critical"
-type RiskStatus = "new" | "pending" | "inprogress" | "completed" | "closed"
+type RiskStatus = "new" | "inprogress" | "pending" | "completed" 
 
 interface Risk {
 	id: string // Firebase Document ID

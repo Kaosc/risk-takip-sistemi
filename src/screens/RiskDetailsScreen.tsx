@@ -223,8 +223,8 @@ export default function RiskDetailsScreen() {
 	}
 
 	const handleClose = async () => {
-		await updateStatus(risk.id, "closed")
-		setStatus("closed")
+		await updateStatus(risk.id, "completed")
+		setStatus("completed")
 	}
 
 	//////////////////////////// STAFF ////////////////////////////
@@ -398,7 +398,7 @@ export default function RiskDetailsScreen() {
 			}
 
 			// TODO: Add rejection button that will clear the assigned note and afterImages and re assign the task to the staff. This will be used when the admin rejects the task and wants to re assign it to the staff.
-			if (risk.status === "completed") {
+			if (risk.status === "pending") {
 				return (
 					<GradientCard style={styles.card}>
 						<ThemedText style={styles.sectionTitle}>Doğrulama</ThemedText>

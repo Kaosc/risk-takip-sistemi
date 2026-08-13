@@ -1,6 +1,23 @@
 {
-   "react-native": {
-      "database_persistence_enabled": true,
-      "crashlytics_debug_enabled": false
-   }
+  "react-native": {
+    "database_persistence_enabled": true,
+    "crashlytics_debug_enabled": false
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "disallowLegacyRuntimeConfig": true,
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ]
 }

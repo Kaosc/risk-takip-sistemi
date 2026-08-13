@@ -49,6 +49,7 @@ export default function RegisterScreen() {
 		setFirebaseError("")
 
 		const uid = await register(data.email, data.password, data.name)
+		
 		if (uid) {
 			navigation.goBack()
 		}

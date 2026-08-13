@@ -1,5 +1,5 @@
 import NetInfo from "@react-native-community/netinfo"
-import { useEffect, useRef } from "react"
+import { useEffect,  } from "react"
 import { Appearance } from "react-native"
 import { useDispatch, useSelector } from "react-redux"
 import { SafeAreaView } from "react-native-safe-area-context"
@@ -8,30 +8,15 @@ import { setSettings } from "../store/features/settingsSlice"
 import { setConfig } from "../store/features/configSlice"
 import { getIsThemeAuto } from "../utils/storage"
 import { setExternalTheme } from "../utils/toggleTheme"
-
-import FirebaseHandler from "../lib/firebase/firebase"
+import { requestNotificationPermission } from "../utils/permissions"
 
 export default function RootProvider({ children }: { children: React.ReactNode }) {
 	const { darkMode } = useSelector((state: RootState) => state.settings)
 	const config = useSelector((state: RootState) => state.config)
 	const dispatch = useDispatch()
 
-	const firebaseInit = useRef(false)
-
-	/////////////////////////////////////////
-	// #region FIREBASE INIT
-	/////////////////////////////////////////
-
-	const initFirebase = async () => {
-		if (!firebaseInit.current) {
-			await FirebaseHandler.initAppCheck().then(async () => {
-				firebaseInit.current = true
-			})
-		}
-	}
-
 	useEffect(() => {
-		initFirebase()
+		requestNotificationPermission()
 	}, [])
 
 	//////////////////////////////////////////

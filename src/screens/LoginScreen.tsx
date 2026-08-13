@@ -70,7 +70,7 @@ export default function LoginScreen() {
 			let user = null
 			user = await login(userAuth?.email || "", userAuth?.password || "")
 
-			dispatch(setAuth({ isAuthenticated: true, uid: user?.uid, email: user?.email, role: role, name: user?.name }))
+			dispatch(setAuth({ isAuthenticated: true, uid: user?.uid, email: user?.email, role: role, name: user?.name, fcmToken: user?.fcmToken }))
 			navigation.dispatch(StackActions.replace("TabNavigator"))
 		} catch (e: any) {
 			console.warn("App.tsx:50", e)
@@ -79,22 +79,6 @@ export default function LoginScreen() {
 		} finally {
 			setIsLoading(false)
 		}
-	}
-
-	const handleForgotPassword = async () => {
-		if (!email.trim()) {
-			setError("E-posta alanı zorunludur.")
-			return
-		}
-
-		setIsLoading(true)
-		const success = await resetPassword(email)
-
-		if (success) {
-			setForgotPassword(false)
-		}
-
-		setIsLoading(false)
 	}
 
 	const handleLogin = async () => {
@@ -119,9 +103,9 @@ export default function LoginScreen() {
 				return
 			}
 
-			const { uid, role, name } = result
+			const { uid, role, name, fcmToken } = result
 
-			dispatch(setAuth({ isAuthenticated: true, uid, email, role, name }))
+			dispatch(setAuth({ isAuthenticated: true, uid, email, role, name, fcmToken }))
 
 			// Store user credentials for auto-login
 			setUserAuth({ email, password })
@@ -134,6 +118,23 @@ export default function LoginScreen() {
 			setIsLoading(false)
 		}
 	}
+
+	const handleForgotPassword = async () => {
+		if (!email.trim()) {
+			setError("E-posta alanı zorunludur.")
+			return
+		}
+
+		setIsLoading(true)
+		const success = await resetPassword(email)
+
+		if (success) {
+			setForgotPassword(false)
+		}
+
+		setIsLoading(false)
+	}
+
 
 	if (isLoading && userAuth && !error) {
 		return (

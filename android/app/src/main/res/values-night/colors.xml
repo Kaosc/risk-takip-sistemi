@@ -2,4 +2,5 @@
   <color name="colorPrimary">#000000</color>
   <color name="colorPrimaryDark">#000000</color>
   <color name="iconBackground">#00000000</color>
+  <color name="notification_blue">#2B6CB0</color>
 </resources>

@@ -1,7 +1,11 @@
-import { getFirestore, doc, getDoc, setDoc, query, where, collection, getDocs } from "@react-native-firebase/firestore"
+import { getFirestore, doc, getDoc, setDoc, query, where, collection, getDocs, updateDoc } from "@react-native-firebase/firestore"
 import { COLLECTIONS } from "../enums"
+import { getMessaging } from "@react-native-firebase/messaging"
+import { getAuth } from "@react-native-firebase/auth"
 
 const db = getFirestore()
+const messaging = getMessaging()
+const auth = getAuth()
 
 export const getStaffUserById = async (uid: string): Promise<User | null> => {
 	try {
@@ -46,5 +50,36 @@ export const getStaffs = async (): Promise<User[]> => {
 	} catch (e) {
 		console.debug("[FIRESTORE] getStaffs:", e)
 		throw e
+	}
+}
+
+export const assignFCMTokenToUser = async (): Promise<string | null> => {
+	try {
+		const currentToken = await messaging.getToken()
+
+		const user = auth.currentUser
+		if (!user) {
+			console.debug("[FIRESTORE] assignFCMTokenToUser: No authenticated user found.")
+			return null
+		}
+
+		const userRef = doc(db, COLLECTIONS.USERS, user.uid)
+		const userSnap = await getDoc(userRef)
+
+		if (userSnap.exists()) {
+			const userData = userSnap.data()
+			
+			if (userData.fcmToken !== currentToken) {
+				await updateDoc(userRef, {
+					fcmToken: currentToken,
+				})
+				console.debug("[FIRESTORE] assignFCMTokenToUser: FCM Token updated in Firestore:", currentToken)
+			}
+		}
+
+		return currentToken
+	} catch (error) {
+		console.debug("[FIRESTORE] assignFCMTokenToUser error:", error)
+		return null
 	}
 }
