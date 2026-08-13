@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native"
 import { useSelector } from "react-redux"
+import { useNavigation, NavigationProp } from "@react-navigation/native"
 
 import ThemedText from "../components/ui/ThemedText"
 import ThemedIcon from "../components/ui/ThemedIcon"
@@ -13,6 +14,7 @@ import { Theme } from "../utils/theme"
 
 export default function RisksScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
+	const navigation = useNavigation() as NavigationProp<any>
 	const styles = createStyles(darkMode)
 
 	const [risks, setRisks] = useState<Risk[]>([])
@@ -41,7 +43,7 @@ export default function RisksScreen() {
 		<TouchableOpacity
 			style={styles.cardWrapper}
 			activeOpacity={0.7}
-			onPress={() => console.log("Navigating to details for:", item.id)}
+			onPress={() => navigation.navigate("RiskDetailsScreen", { risk: item })}
 		>
 			<GradientCard style={styles.card}>
 				<View style={styles.cardHeader}>

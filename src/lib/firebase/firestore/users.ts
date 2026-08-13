@@ -1,4 +1,4 @@
-import { getFirestore, doc, getDoc, setDoc } from "@react-native-firebase/firestore"
+import { getFirestore, doc, getDoc, setDoc, query, where, collection, getDocs } from "@react-native-firebase/firestore"
 import { COLLECTIONS } from "../enums"
 
 const db = getFirestore()
@@ -27,5 +27,24 @@ export const addUser = async (staffData: User): Promise<boolean> => {
 	} catch (error: any) {
 		console.debug("[Firestore] addStaff error:", error?.message || error)
 		return false
+	}
+}
+
+export const getStaffs = async (): Promise<User[]> => {
+	try {
+		const q = query(collection(db, COLLECTIONS.USERS), where("role", "==", "STAFF"))
+
+		const querySnapshot = await getDocs(q)
+		const staffs: User[] = []
+
+		querySnapshot.forEach((doc) => {
+			const data = doc.data() as User
+			staffs.push(data)
+		})
+
+		return staffs
+	} catch (e) {
+		console.debug("[FIRESTORE] getStaffs:", e)
+		throw e
 	}
 }

@@ -20,7 +20,7 @@ import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 
 import { resetPassword, login } from "../lib/firebase/auth"
 import { setAuth } from "../store/features/authSlice"
-import { clearUserAuth, storeStaffCredentials } from "../utils/storage"
+import { clearUserAuth } from "../utils/storage"
 import { Theme } from "../utils/theme"
 
 export default function LoginScreen() {

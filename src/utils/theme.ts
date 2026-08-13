@@ -33,7 +33,7 @@ export const Theme = {
 		cardBackground: __DEV__ ? "#111111" : "#0c0c0c",
 		text: "#ffffff",
 		border: "#333333",
-		gradient: ["#1f1f22", "#000000"] as [ColorValue, ColorValue],
+		gradient: ["#272727", "#1b1b1b"] as [ColorValue, ColorValue],
 		green: {
 			background: "#1f492d",
 			foreground: "#27f08b",

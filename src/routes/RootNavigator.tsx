@@ -5,7 +5,7 @@ import AuthStack from "./stacks/AuthStack"
 
 import SettingsScreen from "../screens/SettingsScreen"
 import TabNavigator from "./TabNavigatior"
-import RiskDetailsScreen from "../screens/RiskDetailsScreen"
+import MemberFormScreen from "../screens/MemberFormScreen"
 
 const Stack = createNativeStackNavigator()
 
@@ -24,12 +24,12 @@ export default function RootNavigator() {
 				component={TabNavigator}
 			/>
 			<Stack.Screen
-				name="RiskDetailsScreen"
-				component={RiskDetailsScreen}
-			/>
-			<Stack.Screen
 				name="SettingsScreen"
 				component={SettingsScreen}
+			/>
+			<Stack.Screen
+				name="MemberFormScreen"
+				component={MemberFormScreen}
 			/>
 			<Stack.Screen
 				name="AuthStack"

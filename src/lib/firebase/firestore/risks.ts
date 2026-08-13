@@ -58,8 +58,8 @@ export const updateRisk = async (id: string, data: Partial<Risk>) => {
 		await updateDoc(doc(db, COLLECTIONS.RISKS, id), {
 			...data,
 			updatedAt: serverTimestamp(),
+			completedAt: serverTimestamp(),
 		})
-
 		return { success: true }
 	} catch (error: any) {
 		console.error("Risk güncellenirken hata oluştu:", error)
@@ -73,6 +73,35 @@ export const deleteRisk = async (id: string) => {
 		return { success: true }
 	} catch (error: any) {
 		console.error("Risk silinirken hata oluştu:", error)
+		return { success: false, error: error.message }
+	}
+}
+
+export const assignRiskToStaff = async (riskId: string, taskDescription: string, dueDate: Date | null, staffId: string) => {
+	try {
+		await updateDoc(doc(db, COLLECTIONS.RISKS, riskId), {
+			assignedTo: staffId,
+			taskDescription: taskDescription,
+			dueDate: dueDate,
+		})
+
+		return { success: true }
+	} catch (error: any) {
+		console.error("Risk personel ataması yapılırken hata oluştu:", error)
+		return { success: false, error: error.message }
+	}
+}
+
+export const updateStatus = async (id: string, newStatus: RiskStatus) => {
+	try {
+		await updateDoc(doc(db, COLLECTIONS.RISKS, id), {
+			status: newStatus,
+			updatedAt: serverTimestamp(),
+		})
+
+		return { success: true }
+	} catch (error: any) {
+		console.error("Risk durumu güncellenirken hata oluştu:", error)
 		return { success: false, error: error.message }
 	}
 }

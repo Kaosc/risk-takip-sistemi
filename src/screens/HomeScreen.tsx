@@ -10,6 +10,8 @@ import GradientCard from "../components/ui/GradientCard"
 import CustomHeader from "../components/CustomHeader"
 
 import { Theme } from "../utils/theme"
+import { logout } from "../lib/firebase/auth"
+import { clearUserAuth } from "../utils/storage"
 
 const getInitials = (name?: string) =>
 	name
@@ -24,7 +26,7 @@ export default function HomeScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const auth = useSelector((state: RootState) => state.auth)
 	const navigation = useNavigation() as NavigationProp<any>
-
+	
 	const styles = createStyles(darkMode)
 
 	return (
@@ -90,7 +92,9 @@ export default function HomeScreen() {
 						/>
 						<ThemedText style={styles.notificationTitle}>Son Bildirimler</ThemedText>
 					</View>
-					<ThemedText style={styles.notificationBody}>Yeni bir durum size atandı. Detayları görüntülemek için dokunun.</ThemedText>
+					<ThemedText style={styles.notificationBody}>
+						Yeni bir durum size atandı. Detayları görüntülemek için dokunun.
+					</ThemedText>
 				</View>
 
 				{/* ===== Actions ===== */}
@@ -107,6 +111,20 @@ export default function HomeScreen() {
 					icon={"plus-circle-outline"}
 					iconSize={22}
 					onPress={() => navigation.navigate("MemberFormScreen")}
+				/>
+
+				<ThemedButton
+					text={"Çıkış Yap"}
+					icon={"logout"}
+					iconSize={22}
+					onPress={() => {
+						logout()
+						clearUserAuth()
+						navigation.reset({
+							index: 0,
+							routes: [{ name: "AuthStack" }],
+						})
+					}}
 				/>
 			</ScrollView>
 		</View>

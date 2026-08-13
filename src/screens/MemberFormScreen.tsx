@@ -7,18 +7,16 @@ import * as ImagePicker from "expo-image-picker"
 import BottomSheet from "@gorhom/bottom-sheet"
 import { useNavigation, NavigationProp } from "@react-navigation/native"
 
-import { Theme } from "../../utils/theme"
-import { AllIconNames } from "../../types/icon"
+import { Theme } from "../utils/theme"
+import { AllIconNames } from "../types/icon"
 
-import ThemedText from "../../components/ui/ThemedText"
-import ThemedButton from "../../components/ui/ThemedButton"
-import ThemedBottomSheet from "../../components/ui/ThemedBottomSheet"
-import GradientCard from "../../components/ui/GradientCard"
-import ThemedIcon from "../../components/ui/ThemedIcon"
-import { addRisk, deleteRisk, updateRisk } from "../../lib/firebase/firestore/risks"
-import { uploadImages } from "../../lib/firebase/storage"
-
-// --- TİPLER VE OPSİYONLAR ---
+import ThemedText from "../components/ui/ThemedText"
+import ThemedButton from "../components/ui/ThemedButton"
+import ThemedBottomSheet from "../components/ui/ThemedBottomSheet"
+import GradientCard from "../components/ui/GradientCard"
+import ThemedIcon from "../components/ui/ThemedIcon"
+import { addRisk, deleteRisk, updateRisk } from "../lib/firebase/firestore/risks"
+import { uploadImages } from "../lib/firebase/storage"
 
 type OptionType = { label: string; value: string }
 
@@ -51,7 +49,6 @@ const selectOptions: Record<SelectFieldName, OptionType[]> = {
 	],
 }
 
-// Seçili İngilizce 'value' değerine karşılık gelen Türkçe 'label'ı bulmak için yardımcı
 const getDisplayLabel = (field: SelectFieldName, value: string) => {
 	const option = selectOptions[field].find((opt) => opt.value === value)
 	return option ? option.label : value
@@ -103,7 +100,6 @@ export default function MemberFormScreen() {
 	const [activeSelect, setActiveSelect] = useState<SelectFieldName | null>(null)
 	const sheetRef = useRef<BottomSheet | null>(null)
 
-	// BİRDEN FAZLA FOTOĞRAF İÇİN ARRAY (DİZİ) KULLANIYORUZ
 	const [images, setImages] = useState<string[]>([])
 	const [isPicking, setIsPicking] = useState(false)
 	const [pickerError, setPickerError] = useState("")
@@ -130,7 +126,6 @@ export default function MemberFormScreen() {
 		},
 	})
 
-	// Dinamik alanları göstermek için anlık olarak 'type' değerini izliyoruz
 	const selectedType = watch("type")
 
 	//////////////////////////// SELECTION ////////////////////////////
@@ -143,16 +138,15 @@ export default function MemberFormScreen() {
 
 	const handleSelect = (optionValue: string) => {
 		if (!activeSelect) return
-		// value olarak İngilizce değeri (opt.value) set ediyoruz
 		setValue(activeSelect, optionValue as any, { shouldValidate: true })
 		sheetRef.current?.close()
 	}
 
 	const sheetItems = activeSelect
 		? selectOptions[activeSelect].map((opt) => ({
-				text: opt.label, // Ekranda Türkçe göster
+				text: opt.label,
 				icon: "check" as AllIconNames,
-				onPress: () => handleSelect(opt.value), // Tıklanınca İngilizce değeri al
+				onPress: () => handleSelect(opt.value),
 			}))
 		: []
 
@@ -194,7 +188,7 @@ export default function MemberFormScreen() {
 		try {
 			const result = await ImagePicker.launchImageLibraryAsync({
 				mediaTypes: ["images"],
-				allowsMultipleSelection: true, // Birden fazla seçime izin ver
+				allowsMultipleSelection: true,
 				quality: 0.7,
 			})
 			if (!result.canceled && result.assets && result.assets.length > 0) {
@@ -219,7 +213,6 @@ export default function MemberFormScreen() {
 		setIsSubmitting(true)
 
 		try {
-			// Form verisini senin Risk interface'ine uygun hale getiriyoruz
 			let formattedData: Partial<Risk> = {
 				type: data.type,
 				category: data.category,
@@ -227,10 +220,9 @@ export default function MemberFormScreen() {
 				description: data.description,
 				severity: data.severity,
 				images: [],
-				status: "New",
+				status: "new",
 			}
 
-			// Eğer tür "Accident" ise, kazaya özel alanları da ekliyoruz
 			if (data.type === "Accident" && data.accidentDetails) {
 				formattedData = {
 					...formattedData,
@@ -245,29 +237,24 @@ export default function MemberFormScreen() {
 				}
 			}
 
-			// 1) Önce risk dokümanını Firestore'a ekle
 			const res = await addRisk(formattedData)
 			if (!res.success || !res.id) {
 				Alert.alert("Kayıt Gönderilmedi", "Risk kaydı oluşturulamadı. Lütfen tekrar deneyin.")
 				return
 			}
 
-			// 2) Görsel varsa Firebase Storage'a yükle
 			if (images.length > 0) {
 				const uploadResult = await uploadImages(images, `risks/${res.id}`)
 
-				// Yükleme başarısızsa eklediğimiz dokümanı geri sil ve kullanıcı tekrar denesin
 				if (!uploadResult.success || !uploadResult.urls) {
 					await deleteRisk(res.id)
 					Alert.alert("Kayıt Gönderilmedi", "Görseller yüklenemedi. Lütfen tekrar deneyin.")
 					return
 				}
 
-				// Yüklenen URL'leri dokümana kaydet
 				await updateRisk(res.id, { images: uploadResult.urls })
 			}
 
-			// 3) Başarılı -> kullanıcıyı bilgilendir ve ana ekrana dön
 			Alert.alert("Başarılı", "Kaydınız başarıyla gönderildi.", [
 				{ text: "Tamam", onPress: () => navigation.navigate("HomeStack", { screen: "HomeScreen" }) },
 			])
@@ -307,7 +294,6 @@ export default function MemberFormScreen() {
 						)}
 					/>
 
-					{/* SADECE "İŞ KAZASI (Accident)" SEÇİLİRSE GÖSTERİLECEK ALANLAR */}
 					{selectedType === "Accident" && (
 						<View style={styles.dynamicSection}>
 							<ThemedText style={styles.sectionTitle}>Kaza Detayları</ThemedText>
@@ -438,7 +424,6 @@ export default function MemberFormScreen() {
 						)}
 					/>
 
-					{/* ===== ÇOKLU FOTOĞRAF ALANI ===== */}
 					<View style={styles.fieldContainer}>
 						<ThemedText style={styles.fieldLabel}>Görseller ({images.length})</ThemedText>
 

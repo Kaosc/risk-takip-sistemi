@@ -71,7 +71,7 @@ interface User {
 // Tip güvenliği (Type Safety) için statik değerleri İngilizce yapıyoruz
 type RiskType = "Risk" | "Accident" | "Near Miss"
 type RiskSeverity = "Low" | "Medium" | "High" | "Critical"
-type RiskStatus = "New" | "In Progress" | "Pending Verification" | "Closed"
+type RiskStatus = "new" | "pending" | "inprogress" | "completed" | "closed"
 
 interface Risk {
 	id: string // Firebase Document ID
