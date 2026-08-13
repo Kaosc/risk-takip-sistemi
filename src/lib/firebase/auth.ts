@@ -29,7 +29,7 @@ export const login = async (email: string, password: string) => {
 		}
 
 		const data = userDoc.data()
-		return { uid, email, role: data?.role as UserRole }
+		return { uid, email, role: data?.role as UserRole, name: data?.name as string }
 	} catch (e: any) {
 		console.debug("[AUTH] loginUser:", e?.message || e)
 

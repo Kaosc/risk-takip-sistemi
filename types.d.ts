@@ -25,6 +25,8 @@ type Auth = {
 	uid: string | undefined
 	role: UserRole | undefined
 	email: string | undefined
+	name: string | undefined
+	profilePic: string | undefined
 }
 
 type Settings = {

@@ -3,4 +3,4 @@ export const LangDBList = {
 	en: require("../lang/en.json"),
 }
 
-export const BOTTOM_TAB_HEIGHT = 56
+export const BOTTOM_TAB_HEIGHT = 64

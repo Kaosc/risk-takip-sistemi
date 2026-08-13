@@ -69,6 +69,10 @@
     })
   }
   ```
+- Use the utils/theme.ts as much as you can when creating styles. It has all the colors and font sizes that I use in the app. You can import it like below.
+  ```ts
+  import { Theme } from "../utils/theme"
+  ```
 
 
 ## Behavior

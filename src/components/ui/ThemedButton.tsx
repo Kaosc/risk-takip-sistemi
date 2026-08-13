@@ -28,6 +28,7 @@ export default function ThemedButton(props: ThemedButtonProps) {
 				<ThemedIcon
 					name={props.icon}
 					size={props.iconSize || 24}
+					color={darkMode ? "#000" : "#fff"}
 				/>
 			)}
 			{props.children || <ThemedText style={styles.buttonText}>{props.text}</ThemedText>}

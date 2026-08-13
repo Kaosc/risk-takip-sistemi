@@ -3,8 +3,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 
 import AuthStack from "./stacks/AuthStack"
 
-import HomeStack from "./stacks/HomeStack"
 import SettingsScreen from "../screens/SettingsScreen"
+import TabNavigator from "./TabNavigatior"
 
 const Stack = createNativeStackNavigator()
 
@@ -13,14 +13,14 @@ export default function RootNavigator() {
 
 	return (
 		<Stack.Navigator
-			initialRouteName={isAuthenticated ? "HomeStack" : "AuthStack"}
+			initialRouteName={isAuthenticated ? "TabNavigator" : "AuthStack"}
 			screenOptions={{
 				headerShown: false,
 			}}
 		>
 			<Stack.Screen
-				name="HomeStack"
-				component={HomeStack}
+				name="TabNavigator"
+				component={TabNavigator}
 			/>
 			<Stack.Screen
 				name="SettingsScreen"

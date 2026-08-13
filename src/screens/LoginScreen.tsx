@@ -70,8 +70,8 @@ export default function LoginScreen() {
 			let user = null
 			user = await login(userAuth?.email || "", userAuth?.password || "")
 
-			dispatch(setAuth({ isAuthenticated: true, uid: user?.uid, email: user?.email, role: role }))
-			navigation.dispatch(StackActions.replace("HomeStack"))
+			dispatch(setAuth({ isAuthenticated: true, uid: user?.uid, email: user?.email, role: role, name: user?.name }))
+			navigation.dispatch(StackActions.replace("TabNavigator"))
 		} catch (e: any) {
 			console.warn("App.tsx:50", e)
 			clearUserAuth()
@@ -122,12 +122,12 @@ export default function LoginScreen() {
 			const { uid, role } = result
 
 			dispatch(setAuth({ isAuthenticated: true, uid, email, role }))
-			
+
 			// Store user credentials for auto-login
 			setUserAuth({ email, password })
 			setRole(role)
 
-			navigation.dispatch(StackActions.replace("HomeStack"))
+			navigation.dispatch(StackActions.replace("TabNavigator"))
 		} catch (e: any) {
 			setError(e?.message || "Giriş başarısız. Lütfen bilgilerinizi kontrol edin.")
 		} finally {
