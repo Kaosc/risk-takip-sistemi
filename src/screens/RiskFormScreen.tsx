@@ -8,79 +8,78 @@ import BottomSheet from "@gorhom/bottom-sheet"
 import { useNavigation, NavigationProp } from "@react-navigation/native"
 
 import { Theme } from "../utils/theme"
-import { AllIconNames } from "../types/icon"
 
 import ThemedText from "../components/ui/ThemedText"
 import ThemedButton from "../components/ui/ThemedButton"
 import ThemedBottomSheet from "../components/ui/ThemedBottomSheet"
-import GradientCard from "../components/ui/GradientCard"
 import ThemedIcon from "../components/ui/ThemedIcon"
+
 import { addRisk, deleteRisk, updateRisk } from "../lib/firebase/firestore/risks"
 import { uploadImages } from "../lib/firebase/storage"
-
-type OptionType = { label: string; value: string }
+import { useTranslation } from "react-i18next"
+import CustomHeader from "../components/CustomHeader"
 
 type SelectFieldName = "type" | "category" | "location" | "severity"
 
-const selectOptions: Record<SelectFieldName, OptionType[]> = {
-	type: [
-		{ label: "Risk Bildirimi", value: "Risk" },
-		{ label: "İş Kazası", value: "Accident" },
-		{ label: "Ramak Kala", value: "Near Miss" },
-	],
+const selectOptions: {
+	type: RiskType[]
+	severity: RiskSeverity[]
+	category: string[]
+	location: string[]
+} = {
+	type: ["risk", "accident", "nearmiss"],
+	severity: ["low", "medium", "high", "critical"],
 	category: [
-		{ label: "Makine/Ekipman", value: "Machinery" },
-		{ label: "Elektrik", value: "Electrical" },
-		{ label: "Yangın", value: "Fire" },
-		{ label: "Kimyasal", value: "Chemical" },
-		{ label: "Diğer", value: "Other" },
+		"electrical",
+		"mechanical",
+		"chemical",
+		"ergonomic",
+		"environmental",
+		"other",
+		"fire",
+		"fall",
+		"vehicle",
+		"explosion",
 	],
 	location: [
-		{ label: "Üretim Alanı", value: "Production" },
-		{ label: "Depo", value: "Warehouse" },
-		{ label: "A Blok", value: "Block A" },
-		{ label: "Dış Alan", value: "Outdoor" },
+		"production_line_1",
+		"production_line_2",
+		"warehouse",
+		"office",
+		"parking_lot",
+		"other",
+		"laboratory",
+		"construction_site",
+		"maintenance_area",
+		"loading_dock",
 	],
-	severity: [
-		{ label: "Düşük", value: "Low" },
-		{ label: "Orta", value: "Medium" },
-		{ label: "Yüksek", value: "High" },
-		{ label: "Kritik", value: "Critical" },
-	],
-}
-
-const getDisplayLabel = (field: SelectFieldName, value: string) => {
-	const option = selectOptions[field].find((opt) => opt.value === value)
-	return option ? option.label : value
 }
 
 type SelectFieldProps = {
-	label: string
-	value?: string
+	value: string
 	error?: string
 	onPress: () => void
 	fieldName: SelectFieldName
 }
 
-function SelectField({ label, value, error, onPress, fieldName }: SelectFieldProps) {
+function SelectField({ value, error, onPress, fieldName }: SelectFieldProps) {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const styles = createStyles(darkMode)
-
-	const displayValue = value ? getDisplayLabel(fieldName, value) : ""
+	const { t } = useTranslation()
 
 	return (
 		<View style={styles.fieldContainer}>
-			<ThemedText style={styles.fieldLabel}>{label}</ThemedText>
+			<ThemedText style={styles.fieldLabel}>{t(fieldName)}</ThemedText>
 			<TouchableOpacity
 				style={[styles.selectField, error && styles.selectFieldError]}
 				onPress={onPress}
 				activeOpacity={0.7}
 			>
 				<ThemedText
-					style={[styles.selectValue, !displayValue && styles.selectPlaceholder]}
+					style={[styles.selectValue]}
 					numberOfLines={1}
 				>
-					{displayValue || "Seçiniz"}
+					{t(value) || "Seçiniz..."}
 				</ThemedText>
 				<ThemedIcon
 					name="chevron-down"
@@ -92,10 +91,12 @@ function SelectField({ label, value, error, onPress, fieldName }: SelectFieldPro
 	)
 }
 
-export default function MemberFormScreen() {
+export default function RiskFormScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
+	const uid = useSelector((state: RootState) => state.auth.uid)
 	const styles = createStyles(darkMode)
 	const navigation = useNavigation() as NavigationProp<any>
+	const { t } = useTranslation()
 
 	const [activeSelect, setActiveSelect] = useState<SelectFieldName | null>(null)
 	const sheetRef = useRef<BottomSheet | null>(null)
@@ -143,10 +144,10 @@ export default function MemberFormScreen() {
 	}
 
 	const sheetItems = activeSelect
-		? selectOptions[activeSelect].map((opt) => ({
-				text: opt.label,
-				icon: "check" as AllIconNames,
-				onPress: () => handleSelect(opt.value),
+		? selectOptions[activeSelect].map((option) => ({
+				text: t(option),
+				icon: "chevron-right" as const,
+				onPress: () => handleSelect(option),
 			}))
 		: []
 
@@ -221,6 +222,7 @@ export default function MemberFormScreen() {
 				severity: data.severity,
 				images: [],
 				status: "new",
+				createdById: uid,
 			}
 
 			if (data.type === "accident" && data.accidentDetails) {
@@ -239,7 +241,7 @@ export default function MemberFormScreen() {
 
 			const res = await addRisk(formattedData)
 			if (!res.success || !res.id) {
-				Alert.alert("Kayıt Gönderilmedi", "Risk kaydı oluşturulamadı. Lütfen tekrar deneyin.")
+				toast.show("Kayıt gönderilemedi. Lütfen tekrar deneyin.", { type: "danger"})
 				return
 			}
 
@@ -248,16 +250,15 @@ export default function MemberFormScreen() {
 
 				if (!uploadResult.success || !uploadResult.urls) {
 					await deleteRisk(res.id)
-					Alert.alert("Kayıt Gönderilmedi", "Görseller yüklenemedi. Lütfen tekrar deneyin.")
+					toast.show("Görseller yüklenemedi. Lütfen tekrar deneyin.", { type: "danger" })
 					return
 				}
 
 				await updateRisk(res.id, { images: uploadResult.urls })
 			}
 
-			Alert.alert("Başarılı", "Kaydınız başarıyla gönderildi.", [
-				{ text: "Tamam", onPress: () => navigation.navigate("TabNavigator", { screen: "HomeStack" }) },
-			])
+			toast.show("Kayıt başarıyla gönderildi.", { type: "success" })
+			navigation.navigate("TabNavigator", { screen: "HomeStack" })
 		} catch (error: any) {
 			console.error("Kayıt gönderilirken hata oluştu:", error)
 			Alert.alert("Kayıt Gönderilmedi", "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.")
@@ -270,22 +271,20 @@ export default function MemberFormScreen() {
 
 	return (
 		<View style={styles.container}>
+			<CustomHeader title={"Yeni Risk/Kaza Bildirimi"} />
 			<ScrollView
 				style={styles.scroll}
 				contentContainerStyle={styles.content}
 				showsVerticalScrollIndicator={false}
 				keyboardShouldPersistTaps="handled"
 			>
-				<GradientCard style={styles.card}>
-					<ThemedText style={styles.title}>Yeni Risk/Kaza Bildirimi</ThemedText>
-
+				<View style={styles.card}>
 					<Controller
 						control={control}
 						name="type"
 						rules={{ required: "Tür zorunludur." }}
 						render={({ field: { value }, fieldState: { error } }) => (
 							<SelectField
-								label="Tür"
 								fieldName="type"
 								value={value}
 								error={error?.message}
@@ -362,7 +361,6 @@ export default function MemberFormScreen() {
 						rules={{ required: "Kategori zorunludur." }}
 						render={({ field: { value }, fieldState: { error } }) => (
 							<SelectField
-								label="Kategori"
 								fieldName="category"
 								value={value}
 								error={error?.message}
@@ -377,11 +375,24 @@ export default function MemberFormScreen() {
 						rules={{ required: "Konum zorunludur." }}
 						render={({ field: { value }, fieldState: { error } }) => (
 							<SelectField
-								label="Konum"
 								fieldName="location"
 								value={value}
 								error={error?.message}
 								onPress={() => openSelect("location")}
+							/>
+						)}
+					/>
+
+					<Controller
+						control={control}
+						name="severity"
+						rules={{ required: "Önem derecesi zorunludur." }}
+						render={({ field: { value }, fieldState: { error } }) => (
+							<SelectField
+								fieldName="severity"
+								value={value}
+								error={error?.message}
+								onPress={() => openSelect("severity")}
 							/>
 						)}
 					/>
@@ -406,21 +417,6 @@ export default function MemberFormScreen() {
 								/>
 								{error ? <Text style={styles.fieldError}>{error.message}</Text> : null}
 							</View>
-						)}
-					/>
-
-					<Controller
-						control={control}
-						name="severity"
-						rules={{ required: "Önem derecesi zorunludur." }}
-						render={({ field: { value }, fieldState: { error } }) => (
-							<SelectField
-								label="Önem Derecesi"
-								fieldName="severity"
-								value={value}
-								error={error?.message}
-								onPress={() => openSelect("severity")}
-							/>
 						)}
 					/>
 
@@ -498,12 +494,12 @@ export default function MemberFormScreen() {
 							</View>
 						)}
 					</ThemedButton>
-				</GradientCard>
+				</View>
 			</ScrollView>
 
 			<ThemedBottomSheet
 				ref={sheetRef}
-				snapPoints={["45%"]}
+				snapPoints={["40%"]}
 				items={sheetItems}
 			/>
 		</View>
@@ -533,7 +529,7 @@ const createStyles = (darkMode: boolean) => {
 		},
 		fieldContainer: {
 			width: "100%",
-			gap: 6,
+			gap: 12,
 		},
 		fieldLabel: {
 			fontSize: 14,
@@ -567,9 +563,6 @@ const createStyles = (darkMode: boolean) => {
 		selectValue: {
 			fontSize: 16,
 			flex: 1,
-		},
-		selectPlaceholder: {
-			opacity: 0.5,
 		},
 		textArea: {
 			borderWidth: 1,
@@ -609,6 +602,7 @@ const createStyles = (darkMode: boolean) => {
 		imageButtonsRow: {
 			flexDirection: "row",
 			gap: 12,
+			marginTop: 5,
 		},
 		imageButton: {
 			flex: 1,

@@ -7,11 +7,13 @@ import HomeStack from "./stacks/HomeStack"
 import RisksStack from "./stacks/RisksStack"
 
 import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
+import SettingsScreen from "../screens/SettingsScreen"
 
 const Tabs = createBottomTabNavigator()
 
 export default function TabNavigator() {
 	const { darkMode } = useSelector((state: RootState) => state.settings)
+	const { role } = useSelector((state: RootState) => state.auth)
 
 	return (
 		<Tabs.Navigator
@@ -66,7 +68,21 @@ export default function TabNavigator() {
 							color={v.color}
 						/>
 					),
-					tabBarLabel: "Riskler",
+					tabBarLabel: role === "MEMBER" ? "Raporlarım" : "Raporlar",
+				}}
+			/>
+			<Tabs.Screen
+				name="SettingsScreen"
+				component={SettingsScreen}
+				options={{
+					tabBarIcon: (v) => (
+						<ThemedIcon
+							name={v.focused ? "cog" : "cog-outline"}
+							size={29}
+							color={v.color}
+						/>
+					),
+					tabBarLabel: "Ayarlar",
 				}}
 			/>
 		</Tabs.Navigator>

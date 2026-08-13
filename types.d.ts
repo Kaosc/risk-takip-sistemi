@@ -72,7 +72,7 @@ interface User {
 // Tip güvenliği (Type Safety) için statik değerleri İngilizce yapıyoruz
 type RiskType = "risk" | "accident" | "nearmiss"
 type RiskSeverity = "low" | "medium" | "high" | "critical"
-type RiskStatus = "new" | "inprogress" | "pending" | "completed" 
+type RiskStatus = "new" | "inprogress" | "pending" | "completed"
 
 interface Risk {
 	id: string // Firebase Document ID
@@ -89,6 +89,7 @@ interface Risk {
 	createdAt: FirebaseTimestamp
 	updatedAt: FirebaseTimestamp
 	status: RiskStatus
+	createdById: string // Riski oluşturan kullanıcının UID'si
 
 	// --- EXTRA FIELDS FOR ACCIDENT (Sadece "type === 'Accident'" ise) ---
 	accidentDetails?: {

@@ -70,7 +70,16 @@ export default function LoginScreen() {
 			let user = null
 			user = await login(userAuth?.email || "", userAuth?.password || "")
 
-			dispatch(setAuth({ isAuthenticated: true, uid: user?.uid, email: user?.email, role: role, name: user?.name, fcmToken: user?.fcmToken }))
+			dispatch(
+				setAuth({
+					isAuthenticated: true,
+					uid: user?.uid,
+					email: user?.email,
+					role: role,
+					name: user?.name,
+					fcmToken: user?.fcmToken,
+				}),
+			)
 			navigation.dispatch(StackActions.replace("TabNavigator"))
 		} catch (e: any) {
 			console.warn("App.tsx:50", e)
@@ -97,7 +106,7 @@ export default function LoginScreen() {
 
 		try {
 			const result = await login(email, password)
-			
+
 			if (!result) {
 				setError("Giriş başarısız. Lütfen bilgilerinizi kontrol edin.")
 				return
@@ -135,11 +144,10 @@ export default function LoginScreen() {
 		setIsLoading(false)
 	}
 
-
 	if (isLoading && userAuth && !error) {
 		return (
-			<View>
-				<ThemedActivityIndicator size="large" />
+			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+				<ThemedActivityIndicator size={80} />
 			</View>
 		)
 	}
@@ -256,7 +264,7 @@ const createStyles = (darkMode: boolean) => {
 			fontWeight: "bold",
 		},
 		error: {
-			color: theme.red.foreground,
+			color: theme.red.fg,
 			marginBottom: 15,
 			fontSize: 15,
 			textAlign: "center",

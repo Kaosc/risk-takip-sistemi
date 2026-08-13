@@ -6,12 +6,12 @@ import { Image } from "expo-image"
 import ThemedText from "../components/ui/ThemedText"
 import ThemedButton from "../components/ui/ThemedButton"
 import ThemedIcon from "../components/ui/ThemedIcon"
-import GradientCard from "../components/ui/GradientCard"
 import CustomHeader from "../components/CustomHeader"
 
 import { Theme } from "../utils/theme"
 import { logout } from "../lib/firebase/auth"
 import { clearUser } from "../utils/storage"
+import { RiskStatusCounts } from "../components/CountsCard"
 
 const getInitials = (name?: string) =>
 	name
@@ -26,22 +26,23 @@ export default function HomeScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const auth = useSelector((state: RootState) => state.auth)
 	const navigation = useNavigation() as NavigationProp<any>
-	
+
 	const styles = createStyles(darkMode)
+
+	const handleLogout = async () => {
+		logout()
+		clearUser()
+		navigation.reset({
+			index: 0,
+			routes: [{ name: "AuthStack" }],
+		})
+	}
 
 	return (
 		<View style={styles.container}>
 			<CustomHeader
-				title="Home"
+				title="Risk Takip Sistemi"
 				showBackButton={false}
-				rightComponent={
-					<TouchableOpacity onPress={() => navigation.navigate("SettingsScreen")}>
-						<ThemedIcon
-							name="cog"
-							size={25}
-						/>
-					</TouchableOpacity>
-				}
 			/>
 
 			<ScrollView
@@ -49,8 +50,8 @@ export default function HomeScreen() {
 				contentContainerStyle={styles.content}
 				showsVerticalScrollIndicator={false}
 			>
-				{/* ===== Profile Card ===== */}
-				<GradientCard style={styles.profileCard}>
+				<View style={styles.topContent}>
+					{/* ===== Profile Card ===== */}
 					<View style={styles.profileRow}>
 						{auth.profilePic ? (
 							<Image
@@ -80,51 +81,36 @@ export default function HomeScreen() {
 								{auth.email || "—"}
 							</ThemedText>
 						</View>
-					</View>
-				</GradientCard>
 
-				{/* ===== Latest Notification Card ===== */}
-				<View style={styles.notificationCard}>
-					<View style={styles.notificationHeader}>
-						<ThemedIcon
-							name="bell-ring-outline"
-							size={22}
-						/>
-						<ThemedText style={styles.notificationTitle}>Son Bildirimler</ThemedText>
+						<TouchableOpacity onPress={handleLogout}>
+							<ThemedIcon
+								name="logout"
+								size={25}
+							/>
+						</TouchableOpacity>
 					</View>
-					<ThemedText style={styles.notificationBody}>
-						Yeni bir durum size atandı. Detayları görüntülemek için dokunun.
-					</ThemedText>
+
+					{/* ===== Latest Notification Card ===== */}
+					<View style={styles.notificationCard}>
+						<View style={styles.notificationHeader}>
+							<ThemedIcon
+								name="bell-ring-outline"
+								size={22}
+							/>
+							<ThemedText style={styles.notificationTitle}>Son Bildirimler</ThemedText>
+						</View>
+						<ThemedText style={styles.notificationBody}>Henüz bildirim yok.</ThemedText>
+					</View>
+
+					<RiskStatusCounts />
 				</View>
 
 				{/* ===== Actions ===== */}
 				<ThemedButton
-					text="Riskleri Görüntüle"
-					icon="shield-alert-outline"
-					iconSize={22}
-					onPress={() => navigation.navigate("RisksStack")}
-					style={styles.primaryButton}
-				/>
-
-				<ThemedButton
 					text={"Yeni Risk Ekle"}
 					icon={"plus-circle-outline"}
 					iconSize={22}
-					onPress={() => navigation.navigate("MemberFormScreen")}
-				/>
-
-				<ThemedButton
-					text={"Çıkış Yap"}
-					icon={"logout"}
-					iconSize={22}
-					onPress={() => {
-						logout()
-						clearUser()
-						navigation.reset({
-							index: 0,
-							routes: [{ name: "AuthStack" }],
-						})
-					}}
+					onPress={() => navigation.navigate("RiskFormScreen")}
 				/>
 			</ScrollView>
 		</View>
@@ -141,7 +127,8 @@ const createStyles = (darkMode: boolean) => {
 		},
 		content: {
 			padding: 20,
-			paddingTop: 28,
+			flexGrow: 1,
+			justifyContent: "space-between",
 			gap: 18,
 		},
 		screenTitle: {
@@ -149,14 +136,16 @@ const createStyles = (darkMode: boolean) => {
 			fontWeight: "800",
 			letterSpacing: 0.5,
 		},
-		profileCard: {
-			borderRadius: 20,
-			padding: 18,
-		},
+		profileCard: {},
 		profileRow: {
 			flexDirection: "row",
 			alignItems: "center",
 			gap: 14,
+			borderRadius: 20,
+			backgroundColor: theme.cardBackground,
+			padding: 18,
+			borderWidth: 1,
+			borderColor: theme.border,
 		},
 		avatar: {
 			width: 64,
@@ -227,6 +216,9 @@ const createStyles = (darkMode: boolean) => {
 		},
 		primaryButton: {
 			marginTop: 6,
+		},
+		topContent: {
+			gap: 15,
 		},
 	})
 }

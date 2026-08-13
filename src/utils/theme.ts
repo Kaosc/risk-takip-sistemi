@@ -30,21 +30,33 @@ export const NavigatorDark: ReactNavigation.Theme = {
 export const Theme = {
 	dark: {
 		background: "#000000",
-		cardBackground: __DEV__ ? "#111111" : "#0c0c0c",
+		cardBackground: "#111111",
 		text: "#ffffff",
 		border: "#333333",
 		gradient: ["#272727", "#1b1b1b"] as [ColorValue, ColorValue],
 		green: {
-			background: "#1f492d",
-			foreground: "#27f08b",
+			bg: "#1f492d",
+			fg: "#27f08b",
 		},
 		red: {
-			background: "#3a1a1a",
-			foreground: "#ff6b6b",
+			bg: "#3a1a1a",
+			fg: "#ff6b6b",
 		},
 		orange: {
-			background: "#3a2a1a",
-			foreground: "#ffb347",
+			bg: "#3a2a1a",
+			fg: "#ffb347",
+		},
+		blue: {
+			bg: "#1a2a3a",
+			fg: "#4da6ff",
+		},
+		violet: {
+			bg: "#2a1a3a",
+			fg: "#b366ff",
+		},
+		primary: {
+			bg: "#444444",
+			fg: "#ffffff",
 		},
 	},
 	light: {
@@ -54,16 +66,28 @@ export const Theme = {
 		border: "#c9c9c9",
 		gradient: ["#e4e4e4", "#ffffff"] as [ColorValue, ColorValue],
 		green: {
-			background: "#b5ffb3",
-			foreground: "#0b8b4b",
+			bg: "#b5ffb3",
+			fg: "#0b8b4b",
 		},
 		red: {
-			background: "#ffdae0",
-			foreground: "#c62828",
+			bg: "#ffdae0",
+			fg: "#c62828",
 		},
 		orange: {
-			background: "#fff0e0",
-			foreground: "#ff8c00",
+			bg: "#fff0e0",
+			fg: "#ff8c00",
+		},
+		blue: {
+			bg: "#e0f0ff",
+			fg: "#1a73e8",
+		},
+		violet: {
+			bg: "#f0e0ff",
+			fg: "#8e24aa",
+		},
+		primary: {
+			bg: "#bbbbbb",
+			fg: "#000000",
 		},
 	},
 }

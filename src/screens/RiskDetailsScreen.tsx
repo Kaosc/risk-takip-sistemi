@@ -326,7 +326,7 @@ export default function RiskDetailsScreen() {
 		if (role === "ADMIN") {
 			if (risk.status === "new") {
 				return (
-					<GradientCard style={styles.card}>
+					<View style={styles.card}>
 						<ThemedText style={styles.sectionTitle}>Görev Atama</ThemedText>
 						<ThemedText style={styles.sectionHint}>Bu bildirimi değerlendirip bir personele görev atayın.</ThemedText>
 
@@ -383,24 +383,24 @@ export default function RiskDetailsScreen() {
 							onPress={handleAssign}
 							disabled={isAssigning}
 						/>
-					</GradientCard>
+					</View>
 				)
 			}
 
 			// info for admin to waiting for staff to complete the task
 			if (risk.status === "inprogress") {
 				return (
-					<GradientCard style={styles.card}>
+					<View style={styles.card}>
 						<ThemedText style={styles.sectionTitle}>Görev Devam Ediyor</ThemedText>
 						<ThemedText style={styles.sectionHint}>Bu bildirimin görevi devam ediyor.</ThemedText>
-					</GradientCard>
+					</View>
 				)
 			}
 
 			// TODO: Add rejection button that will clear the assigned note and afterImages and re assign the task to the staff. This will be used when the admin rejects the task and wants to re assign it to the staff.
 			if (risk.status === "pending") {
 				return (
-					<GradientCard style={styles.card}>
+					<View style={styles.card}>
 						<ThemedText style={styles.sectionTitle}>Doğrulama</ThemedText>
 						<ThemedText style={styles.fieldLabel}>Personelin Yüklediği Görseller</ThemedText>
 						<ThumbnailsRow images={risk.afterImages || []} />
@@ -412,7 +412,7 @@ export default function RiskDetailsScreen() {
 							icon="check"
 							onPress={handleClose}
 						/>
-					</GradientCard>
+					</View>
 				)
 			}
 
@@ -426,7 +426,7 @@ export default function RiskDetailsScreen() {
 
 			if (risk.status === "inprogress") {
 				return (
-					<GradientCard style={styles.card}>
+					<View style={styles.card}>
 						<ThemedText style={styles.sectionTitle}>Görevi Tamamla</ThemedText>
 
 						<ThemedText style={styles.fieldLabel}>Sonrası Görselleri</ThemedText>
@@ -473,7 +473,7 @@ export default function RiskDetailsScreen() {
 							icon="check"
 							onPress={handleCompleteTask}
 						/>
-					</GradientCard>
+					</View>
 				)
 			}
 
@@ -481,10 +481,10 @@ export default function RiskDetailsScreen() {
 		}
 
 		return (
-			<GradientCard style={styles.card}>
+			<View style={styles.card}>
 				<ThemedText style={styles.sectionTitle}>Takip</ThemedText>
 				<ThemedText style={styles.description}>Bu bildirimin güncel durumunu buradan takip edebilirsiniz.</ThemedText>
-			</GradientCard>
+			</View>
 		)
 	}
 
@@ -509,7 +509,7 @@ export default function RiskDetailsScreen() {
 				)}
 
 				{/* ===== TOP: BASIC DETAILS ===== */}
-				<GradientCard style={styles.card}>
+				<View style={styles.card}>
 					<View style={styles.headerRow}>
 						<ThemedIcon
 							name="clipboard-text-outline"
@@ -546,7 +546,7 @@ export default function RiskDetailsScreen() {
 
 					<ThemedText style={styles.fieldLabel}>Açıklama</ThemedText>
 					<ThemedText style={styles.description}>{risk.description || "-"}</ThemedText>
-				</GradientCard>
+				</View>
 
 				{/* ===== BOTTOM: ROLE-BASED ACTIONS ===== */}
 				{renderRoleSection()}
@@ -582,6 +582,7 @@ const createStyles = (darkMode: boolean) => {
 			borderRadius: 16,
 			padding: 16,
 			gap: 10,
+			backgroundColor: theme.cardBackground,
 		},
 		headerRow: {
 			flexDirection: "row",

@@ -2,10 +2,11 @@ import { useSelector } from "react-redux"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 
 import AuthStack from "./stacks/AuthStack"
-
-import SettingsScreen from "../screens/SettingsScreen"
 import TabNavigator from "./TabNavigatior"
-import MemberFormScreen from "../screens/MemberFormScreen"
+
+import RiskFormScreen from "../screens/RiskFormScreen"
+import SettingsScreen from "../screens/SettingsScreen"
+import RiskDetailsScreen from "../screens/RiskDetailsScreen"
 
 const Stack = createNativeStackNavigator()
 
@@ -24,12 +25,16 @@ export default function RootNavigator() {
 				component={TabNavigator}
 			/>
 			<Stack.Screen
+				name="RiskDetailsScreen"
+				component={RiskDetailsScreen}
+			/>
+			<Stack.Screen
 				name="SettingsScreen"
 				component={SettingsScreen}
 			/>
 			<Stack.Screen
-				name="MemberFormScreen"
-				component={MemberFormScreen}
+				name="RiskFormScreen"
+				component={RiskFormScreen}
 			/>
 			<Stack.Screen
 				name="AuthStack"

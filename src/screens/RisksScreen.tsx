@@ -1,24 +1,50 @@
-import { useEffect, useState } from "react"
-import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { FlatList, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
 import { useSelector } from "react-redux"
-import { useNavigation, NavigationProp } from "@react-navigation/native"
+import { useNavigation, NavigationProp, useFocusEffect } from "@react-navigation/native"
+import { useTranslation } from "react-i18next"
 
 import ThemedText from "../components/ui/ThemedText"
 import ThemedIcon from "../components/ui/ThemedIcon"
 import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
-import GradientCard from "../components/ui/GradientCard"
 import CustomHeader from "../components/CustomHeader"
 
-import { getAllRisks } from "../lib/firebase/firestore/risks"
+import { getAllRisks, getRisksAssignedToStaff, getRisksByUserId } from "../lib/firebase/firestore/risks"
 import { Theme } from "../utils/theme"
+import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
 
-export default function RisksScreen() {
+export default function RisksScreen({
+	route,
+}: {
+	route: {
+		params: {
+			status: RiskStatus
+		}
+	}
+}) {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
+	const { role, uid } = useSelector((state: RootState) => state.auth)
 	const navigation = useNavigation() as NavigationProp<any>
+	const { t } = useTranslation()
+
 	const styles = createStyles(darkMode)
 
 	const [risks, setRisks] = useState<Risk[]>([])
 	const [loading, setLoading] = useState(true)
+	const [statusFilter, setStatusFilter] = useState<RiskStatus | null>(route.params?.status || null)
+
+	const filteredRisks = useMemo(() => {
+		if (statusFilter) {
+			return risks.filter((risk) => risk.status === statusFilter)
+		}
+		return risks
+	}, [risks, statusFilter])
+
+	useFocusEffect(
+		useCallback(() => {
+			navigation.setParams({ status: undefined })
+		}, []),
+	)
 
 	useEffect(() => {
 		fetchRisks()
@@ -26,9 +52,63 @@ export default function RisksScreen() {
 
 	const fetchRisks = async () => {
 		setLoading(true)
-		const data = await getAllRisks()
-		setRisks(data)
+
+		if (role === "MEMBER" && uid) {
+			const data = await getRisksByUserId(uid)
+			setRisks(data)
+		}
+
+		if (role === "STAFF" && uid) {
+			const data = await getRisksAssignedToStaff(uid)
+			setRisks(data)
+		}
+
+		if (role === "ADMIN") {
+			const data = await getAllRisks()
+			setRisks(data)
+		}
+
 		setLoading(false)
+	}
+
+	const theme = Theme[darkMode ? "dark" : "light"]
+
+	const severityBadgeColor: Record<RiskSeverity, { bg: string; txt: string }> = {
+		low: {
+			bg: theme.primary.bg,
+			txt: theme.primary.fg,
+		},
+		medium: {
+			bg: theme.green.bg,
+			txt: theme.green.fg,
+		},
+		high: {
+			bg: theme.orange.bg,
+			txt: theme.orange.fg,
+		},
+		critical: {
+			bg: theme.red.bg,
+			txt: theme.red.fg,
+		},
+	}
+
+	const statusBadgeColor: Record<RiskStatus, { bg: string; txt: string }> = {
+		new: {
+			bg: theme.primary.bg,
+			txt: theme.primary.fg,
+		},
+		inprogress: {
+			bg: theme.blue.bg,
+			txt: theme.blue.fg,
+		},
+		pending: {
+			bg: theme.orange.bg,
+			txt: theme.orange.fg,
+		},
+		completed: {
+			bg: theme.green.bg,
+			txt: theme.green.fg,
+		},
 	}
 
 	if (loading) {
@@ -45,13 +125,13 @@ export default function RisksScreen() {
 			activeOpacity={0.7}
 			onPress={() => navigation.navigate("RiskDetailsScreen", { risk: item })}
 		>
-			<GradientCard style={styles.card}>
+			<View style={styles.card}>
 				<View style={styles.cardHeader}>
 					<ThemedIcon
 						name="clipboard-text-outline"
 						size={22}
 					/>
-					<ThemedText style={styles.cardType}>{item.type}</ThemedText>
+					<ThemedText style={styles.cardType}>{t(item.type)}</ThemedText>
 				</View>
 
 				<View style={styles.metaRow}>
@@ -59,7 +139,7 @@ export default function RisksScreen() {
 						name="tag-outline"
 						size={18}
 					/>
-					<ThemedText style={styles.metaText}>{item.category}</ThemedText>
+					<ThemedText style={styles.metaText}>{t(item.category)}</ThemedText>
 				</View>
 
 				<View style={styles.metaRow}>
@@ -67,33 +147,87 @@ export default function RisksScreen() {
 						name="map-marker-outline"
 						size={18}
 					/>
-					<ThemedText style={styles.metaText}>{item.location}</ThemedText>
+					<ThemedText style={styles.metaText}>{t(item.location)}</ThemedText>
 				</View>
 
 				<View style={styles.badgeRow}>
-					<View style={styles.badge}>
-						<ThemedText style={styles.badgeText}>Önem: {item.severity}</ThemedText>
+					<View
+						style={[
+							styles.badge,
+							{ backgroundColor: severityBadgeColor[item.severity].bg, borderColor: severityBadgeColor[item.severity].txt },
+						]}
+					>
+						<ThemedText style={[styles.badgeText, { color: severityBadgeColor[item.severity].txt }]}>
+							<ThemedText>Önem: </ThemedText> {t(item.severity)}
+						</ThemedText>
 					</View>
-					<View style={styles.badge}>
-						<ThemedText style={styles.badgeText}>Durum: {item.status}</ThemedText>
+					<View
+						style={[
+							styles.badge,
+							{ backgroundColor: statusBadgeColor[item.status].bg, borderColor: statusBadgeColor[item.status].txt },
+						]}
+					>
+						<ThemedText style={[styles.badgeText, { color: statusBadgeColor[item.status].txt }]}>
+							<ThemedText>Durum: </ThemedText> {t(item.status)}
+						</ThemedText>
 					</View>
 				</View>
-			</GradientCard>
+			</View>
 		</TouchableOpacity>
+	)
+
+	const TabButtons = () => (
+		<ScrollView
+			horizontal
+			style={styles.tabRow}
+			contentContainerStyle={{ flexGrow: 1, justifyContent: "space-around", paddingHorizontal: 5, gap: 8 }}
+		>
+			{(["new", "inprogress", "pending", "completed"] as RiskStatus[]).map((status) => (
+				<TouchableOpacity
+					key={status}
+					style={[
+						styles.badge,
+						{
+							minHeight: 34,
+							paddingHorizontal: 14,
+							paddingVertical: 6,
+							backgroundColor: statusBadgeColor[status].bg,
+							borderColor: statusBadgeColor[status].txt,
+							opacity: statusFilter === status ? 1 : 0.55,
+						},
+					]}
+					onPress={() => {
+						if (statusFilter === status) {
+							setStatusFilter(null)
+						} else {
+							setStatusFilter(status)
+						}
+					}}
+				>
+					<ThemedText style={[styles.badgeLabel, { color: statusBadgeColor[status].txt, fontSize: 14 }]}>{t(status)}</ThemedText>
+				</TouchableOpacity>
+			))}
+		</ScrollView>
 	)
 
 	return (
 		<View style={styles.container}>
-			<CustomHeader title="Riskler" />
+			<CustomHeader title={role === "ADMIN" ? "Raporlar" : "Raporlarım"} />
+			<TabButtons />
 			<FlatList
-				data={risks}
+				data={filteredRisks}
 				keyExtractor={(item) => item.id}
 				renderItem={renderItem}
 				contentContainerStyle={styles.listContent}
 				showsVerticalScrollIndicator={false}
 				ListEmptyComponent={
 					<View style={styles.emptyContainer}>
-						<ThemedText style={styles.emptyText}>Henüz kayıtlı risk bulunmuyor.</ThemedText>
+						<ThemedIcon
+							name="alert-circle-outline"
+							size={50}
+							style={{ opacity: 0.6 }}
+						/>
+						<ThemedText style={styles.emptyText}>Kayıtlı risk raporunuz yok</ThemedText>
 					</View>
 				}
 			/>
@@ -106,7 +240,6 @@ const createStyles = (darkMode: boolean) => {
 
 	return StyleSheet.create({
 		container: {
-			flex: 1,
 			backgroundColor: theme.background,
 		},
 		loadingContainer: {
@@ -119,15 +252,26 @@ const createStyles = (darkMode: boolean) => {
 			padding: 16,
 			paddingBottom: 24,
 			gap: 12,
+			flexGrow: 1,
+			height: "100%",
 		},
 		cardWrapper: {
 			borderRadius: 16,
 			overflow: "hidden",
 		},
+		tabRow: {
+			paddingVertical: 12,
+			borderRadius: 12,
+			marginHorizontal: 10,
+			marginTop: 10,
+		},
 		card: {
 			borderRadius: 16,
 			padding: 16,
 			gap: 8,
+			backgroundColor: theme.cardBackground,
+			borderWidth: 1,
+			borderColor: theme.border,
 		},
 		cardHeader: {
 			flexDirection: "row",
@@ -154,6 +298,10 @@ const createStyles = (darkMode: boolean) => {
 			gap: 8,
 			marginTop: 8,
 		},
+		row: {
+			alignItems: "center",
+			gap: 8,
+		},
 		badge: {
 			paddingHorizontal: 10,
 			paddingVertical: 4,
@@ -162,17 +310,25 @@ const createStyles = (darkMode: boolean) => {
 			borderColor: theme.border,
 			backgroundColor: darkMode ? "#1f1f22" : "#ffffff",
 		},
-		badgeText: {
+		badgeLabel: {
 			fontSize: 12,
+			fontWeight: "600",
+		},
+		badgeText: {
+			fontSize: 14,
 			fontWeight: "600",
 		},
 		emptyContainer: {
 			alignItems: "center",
-			paddingTop: 60,
+			justifyContent: "center",
+			flex: 1,
+			gap: 12,
+			paddingBottom: BOTTOM_TAB_HEIGHT,
 		},
 		emptyText: {
 			fontSize: 15,
 			opacity: 0.6,
+			textAlign: "center",
 		},
 	})
 }

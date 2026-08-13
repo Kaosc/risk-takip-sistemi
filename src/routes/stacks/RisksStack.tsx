@@ -17,13 +17,6 @@ export default function RisksStack() {
 				}}
 			/>
 			<Stack.Screen
-				name="RiskDetailsScreen"
-				component={RiskDetailsScreen}
-				options={{
-					headerShown: false,
-				}}
-			/>
-			<Stack.Screen
 				name="SearchScreen"
 				component={SearchScreen}
 				options={{
