@@ -1,0 +1,20 @@
+# src/routes/stacks/HomeStack.tsx
+   - src/screens/HomeScreen
+      - A user profile card like name, role and a profile icon maybe email too.
+      - A button to navigate to the RisksStack
+      - A button to navigate to FormScreen depending on the role (e.g: if its admin it will navigate to AdminFormScreen, if its staff it will navigate to StaffFormScreen, if its member it will navigate to MemberFormScreen)
+      - A card maybe under the profile card that will show the latest notifications from fcm (like for a member if the case status changes (like closed etc.), for staff if a new case is assigned to them, for admin if a new case is created)
+   - src/screens/AdminFormScreen
+   - src/screens/StaffFormScreen
+   - src/screens/MemberFormScreen
+# RisksStack
+   - src/screens/RisksScreen
+   - src/screens/RiskDetailsScreen: (This screen will have button to navigate to RiskFormScreen order to edit the risk depending on the role (e.g: if its admin it will navigate to AdminFormScreen, if its staff it will navigate to StaffFormScreen, if its member it will navigate to MemberFormScreen))
+      - src/screens/SearchScreen
+# src/providers/FirebaseProvider.tsx
+   - This provider's parent will be the RootProvider which we are initting the firebase there. This provider will handle the fcm notifications. Maybe later we can add a logic to navigate directly to the RiskDetailsScreen if the notification is about a specific risk. This provider will also handle the logic to show the notifications in the HomeScreen.
+# lib/notifications.ts
+   - Will have the spesific notification function maybe expo-notifications and firebase firestore logics combined. etc we will look in to that later.
+# Packages
+   - expo-notifications (https://docs.expo.dev/versions/latest/sdk/notifications/)
+   - react-native-firebase/messaging (https://rnfirebase.io/messaging/usage)

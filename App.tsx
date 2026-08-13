@@ -8,6 +8,8 @@ import { NavigationContainer } from "@react-navigation/native"
 import BootSplash from "react-native-bootsplash"
 
 import RootProvider from "./src/providers/RootProvider"
+import FirebaseProvider from "./src/providers/FirebaseProvider"
+
 import RootNavigator from "./src/routes/RootNavigator"
 
 import { NavigatorDark, NavigatorLight } from "./src/utils/theme"
@@ -37,12 +39,14 @@ export default function App() {
 
 	return (
 		<RootProvider>
-			<NavigationContainer
-				onReady={onReady}
-				theme={darkMode ? NavigatorDark : NavigatorLight}
-			>
-				<RootNavigator />
-			</NavigationContainer>
+			<FirebaseProvider>
+				<NavigationContainer
+					onReady={onReady}
+					theme={darkMode ? NavigatorDark : NavigatorLight}
+				>
+					<RootNavigator />
+				</NavigationContainer>
+			</FirebaseProvider>
 		</RootProvider>
 	)
 }

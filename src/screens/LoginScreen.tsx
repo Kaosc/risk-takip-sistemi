@@ -31,8 +31,8 @@ export default function LoginScreen() {
 
 	const styles = createStyles(darkMode)
 
-	const [userAuth] = useMMKVObject<UserAuth | undefined>("auth")
-	const [role] = useMMKVString("role")
+	const [userAuth, setUserAuth] = useMMKVObject<UserAuth | undefined>("auth")
+	const [role, setRole] = useMMKVString("role")
 
 	const [forgotPassword, setForgotPassword] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
@@ -61,6 +61,11 @@ export default function LoginScreen() {
 	const autoLogin = async () => {
 		try {
 			setIsLoading(true)
+
+			if (!userAuth || !role) {
+				setIsLoading(false)
+				return
+			}
 
 			let user = null
 			user = await login(userAuth?.email || "", userAuth?.password || "")
@@ -117,7 +122,10 @@ export default function LoginScreen() {
 			const { uid, role } = result
 
 			dispatch(setAuth({ isAuthenticated: true, uid, email, role }))
-			storeStaffCredentials(email, password)
+			
+			// Store user credentials for auto-login
+			setUserAuth({ email, password })
+			setRole(role)
 
 			navigation.dispatch(StackActions.replace("HomeStack"))
 		} catch (e: any) {

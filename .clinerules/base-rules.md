@@ -47,6 +47,29 @@
   ```ts
   const darkMode = useSelector((state: RootState) => state.settings.darkMode)
   ```
+- when creating styleSheet, use the following structure to create styles based on the current theme mode.
+  ```ts
+  // Get the current theme mode from redux state will be in the component
+  const styles = createStyles(darkMode)
+
+  // Create a function that returns the styles based on the current theme mode
+  const createStyles = (darkMode: boolean) => {
+    const theme = Theme[darkMode ? "dark" : "light"]
+
+    return StyleSheet.create({
+      button: {
+        borderWidth: 1,
+        borderColor: theme.border,
+        borderRadius: 8,
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        fontSize: 16,
+        marginBottom: 16,
+      },
+    })
+  }
+  ```
+
 
 ## Behavior
 - Don't explain obvious things

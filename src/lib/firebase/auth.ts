@@ -38,6 +38,8 @@ export const login = async (email: string, password: string) => {
 				throw new Error("Kullanıcı bulunamadı. Lütfen kayıt olun.")
 			case "auth/wrong-password":
 				throw new Error("Yanlış şifre. Lütfen tekrar deneyin.")
+			case "auth/invalid-credential":
+				throw new Error("Şifre veya e-posta hatalı. Lütfen tekrar deneyin.")
 			case "auth/invalid-email":
 				throw new Error("Geçersiz e-posta adresi. Lütfen geçerli bir e-posta adresi girin.")
 			case "auth/too-many-requests":
