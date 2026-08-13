@@ -6,6 +6,7 @@ import { useEffect } from "react"
 import { useSelector } from "react-redux"
 import { NavigationContainer } from "@react-navigation/native"
 import BootSplash from "react-native-bootsplash"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 import RootProvider from "./src/providers/RootProvider"
 import FirebaseProvider from "./src/providers/FirebaseProvider"
@@ -38,15 +39,17 @@ export default function App() {
 	}
 
 	return (
-		<RootProvider>
-			<FirebaseProvider>
-				<NavigationContainer
-					onReady={onReady}
-					theme={darkMode ? NavigatorDark : NavigatorLight}
-				>
-					<RootNavigator />
-				</NavigationContainer>
-			</FirebaseProvider>
-		</RootProvider>
+		<GestureHandlerRootView style={{ flex: 1 }}>
+			<RootProvider>
+				<FirebaseProvider>
+					<NavigationContainer
+						onReady={onReady}
+						theme={darkMode ? NavigatorDark : NavigatorLight}
+					>
+						<RootNavigator />
+					</NavigationContainer>
+				</FirebaseProvider>
+			</RootProvider>
+		</GestureHandlerRootView>
 	)
 }

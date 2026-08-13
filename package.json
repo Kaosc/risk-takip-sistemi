@@ -19,7 +19,8 @@
     "update": "node version.updater.js",
     "openbundledir": "explorer D:\\Dev\\driverbook\\android\\app\\build\\outputs\\bundle\\release",
     "openbundledirmac": "open android/app/build/outputs/bundle/release",
-    "pod": "cd ios && pod install && cd .."
+    "pod": "cd ios && pod install && cd ..",
+    "tree": "npx tree-node-cli -I 'node_modules|.git|.expo|android|ios|assets'"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -43,6 +44,7 @@
     "expo-camera": "~55.0.20",
     "expo-font": "~55.0.8",
     "expo-image": "~55.0.11",
+    "expo-image-picker": "~55.0.22",
     "expo-linear-gradient": "~55.0.16",
     "expo-localization": "~55.0.16",
     "expo-status-bar": "~55.0.6",

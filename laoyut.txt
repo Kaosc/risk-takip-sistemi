@@ -18,3 +18,4 @@
 # Packages
    - expo-notifications (https://docs.expo.dev/versions/latest/sdk/notifications/)
    - react-native-firebase/messaging (https://rnfirebase.io/messaging/usage)
+   - expo-image-picker (https://docs.expo.dev/versions/latest/sdk/imagepicker/)

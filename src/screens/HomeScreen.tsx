@@ -9,14 +9,7 @@ import ThemedIcon from "../components/ui/ThemedIcon"
 import GradientCard from "../components/ui/GradientCard"
 import CustomHeader from "../components/CustomHeader"
 
-import { AllIconNames } from "../types/icon"
 import { Theme } from "../utils/theme"
-
-const roleActions: Record<string, { title: string; destination: string; icon: AllIconNames }> = {
-	member: { title: "Create New Risk/Case", destination: "MemberFormScreen", icon: "creation-outline" },
-	staff: { title: "Update Assigned Task", destination: "StaffFormScreen", icon: "pencil-outline" },
-	admin: { title: "Manage Cases", destination: "AdminFormScreen", icon: "briefcase-account-outline" },
-}
 
 const getInitials = (name?: string) =>
 	name
@@ -34,20 +27,13 @@ export default function HomeScreen() {
 
 	const styles = createStyles(darkMode)
 
-	// Normalize the role so the mapping is case-insensitive.
-	const action = roleActions[(auth.role || "").toLowerCase()] ?? roleActions.member
-
-	const handleNavigate = (destination: string) => {
-		navigation.navigate(destination)
-	}
-
 	return (
 		<View style={styles.container}>
 			<CustomHeader
 				title="Home"
 				showBackButton={false}
 				rightComponent={
-					<TouchableOpacity onPress={() => handleNavigate("SettingsScreen")}>
+					<TouchableOpacity onPress={() => navigation.navigate("SettingsScreen")}>
 						<ThemedIcon
 							name="cog"
 							size={25}
@@ -102,25 +88,25 @@ export default function HomeScreen() {
 							name="bell-ring-outline"
 							size={22}
 						/>
-						<ThemedText style={styles.notificationTitle}>Latest Notification</ThemedText>
+						<ThemedText style={styles.notificationTitle}>Son Bildirimler</ThemedText>
 					</View>
-					<ThemedText style={styles.notificationBody}>New case assigned to you. Tap to view the details.</ThemedText>
+					<ThemedText style={styles.notificationBody}>Yeni bir durum size atandı. Detayları görüntülemek için dokunun.</ThemedText>
 				</View>
 
 				{/* ===== Actions ===== */}
 				<ThemedButton
-					text="View Risks"
+					text="Riskleri Görüntüle"
 					icon="shield-alert-outline"
 					iconSize={22}
-					onPress={() => handleNavigate("RisksStack")}
+					onPress={() => navigation.navigate("RisksStack")}
 					style={styles.primaryButton}
 				/>
 
 				<ThemedButton
-					text={action.title}
-					icon={action.icon}
+					text={"Yeni Risk Ekle"}
+					icon={"plus-circle-outline"}
 					iconSize={22}
-					onPress={() => handleNavigate(action.destination)}
+					onPress={() => navigation.navigate("MemberFormScreen")}
 				/>
 			</ScrollView>
 		</View>

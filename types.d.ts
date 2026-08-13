@@ -49,9 +49,6 @@ type ConsentValues = {
 ////////////////////// DATA ///////////////////////
 ///////////////////////////////////////////////////
 
-
-type UserRole = "ADMIN" | "STAFF" | "MEMBER"
-
 type FieldValue = import("@react-native-firebase/firestore").FieldValue
 type FirebaseTimestamp = import("@react-native-firebase/firestore").Timestamp
 
@@ -60,6 +57,8 @@ interface UserAuth {
 	password: string
 }
 
+type UserRole = "ADMIN" | "STAFF" | "MEMBER"
+
 interface User {
 	uid: string
 	email: string
@@ -67,4 +66,59 @@ interface User {
 	name: string
 	createdAt: FirebaseTimestamp
 	updatedAt: FirebaseTimestamp
+}
+
+// Tip güvenliği (Type Safety) için statik değerleri İngilizce yapıyoruz
+type RiskType = "Risk" | "Accident" | "Near Miss"
+type RiskSeverity = "Low" | "Medium" | "High" | "Critical"
+type RiskStatus = "New" | "Under Review" | "In Progress" | "Pending Verification" | "Completed" | "Closed"
+
+interface Risk {
+	id: string // Firebase Document ID
+	reportNumber?: string // İsteğe bağlı (Örn: 2026-0154)
+
+	// --- 1. REPORTING STAGE (Çalışan Doldurur) ---
+	type: RiskType
+	category: string // "Machinery", "Electrical", "Fire" vb.
+	location: string // "Production Line 2", "Warehouse" vb.
+	description: string
+	severity: RiskSeverity
+	images: string[]
+	createdBy: string
+	createdAt: FirebaseTimestamp
+	updatedAt: FirebaseTimestamp
+
+	// --- EXTRA FIELDS FOR ACCIDENT (Sadece "type === 'Accident'" ise) ---
+	accidentDetails?: {
+		involvedPersons: string[] // Kazaya karışan kişiler
+		injuryStatus: string // "Minor scratch", "Fracture" vb.
+		firstAidProvided: boolean // İlk müdahale yapıldı mı?
+	}
+
+	// --- 2. ASSESSMENT & ASSIGNMENT STAGE (İSG Uzmanı Doldurur) ---
+	status: RiskStatus
+	assignedTo?: string // Görev atanan personelin UID'si
+	taskDescription?: string // Yapılması istenen düzeltici faaliyet
+	dueDate?: FirebaseTimestamp // Termin tarihi
+
+	// --- 3. ACTION / RESOLUTION STAGE (Bakım Personeli Doldurur) ---
+	afterImages?: string[] // İşlem bittikten sonra çekilen "Sonra" fotoğrafları
+	completedAt?: FirebaseTimestamp // Görevin tamamlandığı tarih
+	completionNotes?: string // Yapılan işlemlerle ilgili notlar
+}
+
+type MemberFormData = {
+	type: RiskType
+	category: string
+	location: string
+	description: string
+	severity: RiskSeverity
+	images: string[]
+
+	// Kaza detayları (Sadece type === 'Accident' ise)
+	accidentDetails?: {
+		involvedPersons: string
+		injuryStatus: string
+		firstAidProvided: boolean
+	}
 }
