@@ -1,6 +1,6 @@
 import { getFirestore, doc, getDoc, setDoc, query, where, collection, getDocs, updateDoc } from "@react-native-firebase/firestore"
 import { COLLECTIONS } from "../enums"
-import { getMessaging } from "@react-native-firebase/messaging"
+import { getMessaging, getToken } from "@react-native-firebase/messaging"
 import { getAuth } from "@react-native-firebase/auth"
 
 const db = getFirestore()
@@ -55,7 +55,7 @@ export const getStaffs = async (): Promise<User[]> => {
 
 export const assignFCMTokenToUser = async (): Promise<string | null> => {
 	try {
-		const currentToken = await messaging.getToken()
+		const currentToken = await getToken(messaging)
 
 		const user = auth.currentUser
 		if (!user) {

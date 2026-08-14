@@ -1,13 +1,18 @@
 import { View, StyleSheet, TouchableOpacity } from "react-native"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { useSelector } from "react-redux"
+import { getMessaging, onMessage } from "@react-native-firebase/messaging"
+import { useEffect } from "react"
 import { useMMKVObject } from "react-native-mmkv"
 
 import ThemedText from "./ui/ThemedText"
 import ThemedIcon from "./ui/ThemedIcon"
+import NotificationItem from "./NotificationItem"
 
 import { Theme } from "../utils/theme"
-import { safeTimestampToDateTimeString } from "../utils/date"
+import { processNotification } from "../lib/notifications"
+
+const messaging = getMessaging()
 
 export default function NotificationsCard() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
@@ -15,15 +20,32 @@ export default function NotificationsCard() {
 
 	const styles = createStyles(darkMode)
 
-	const [notifications, setNotifications] = useMMKVObject<NotificationData[]>("latestNotifications")
+	const [notifications, setNotifications] = useMMKVObject<NotificationData[] | undefined>("notifications")
 
 	const handlePress = (riskId: string | object) => {
 		navigation.navigate("RiskDetailsScreen", { riskId })
+		setNotifications(notifications?.filter((notification) => notification.riskId !== riskId) || [])
 
-		// TODO: Uncomment after testings done
-		// Remove the pressed notification from the list
-		// setNotifications(notifications?.filter((notification) => notification.riskId !== riskId) || [])
+		// Mark the notification as read
+		setNotifications(
+			notifications?.map((notification) => (notification.riskId === riskId ? { ...notification, read: true } : notification)),
+		)
 	}
+
+	useEffect(() => {
+		const unsubscribe = onMessage(messaging, async (remoteMessage) => {
+			const newNotification = processNotification(remoteMessage)
+			if (newNotification) {
+				if (Array.isArray(notifications)) {
+					setNotifications((prev) => [newNotification, ...(prev || [])])
+				} else {
+					setNotifications([newNotification])
+				}
+			}
+		})
+
+		return unsubscribe
+	}, [])
 
 	return (
 		<View style={styles.notificationCard}>
@@ -35,28 +57,35 @@ export default function NotificationsCard() {
 				<ThemedText style={styles.notificationTitle}>Son Bildirimler</ThemedText>
 			</View>
 
-			{notifications && notifications.length > 0 ? (
-				notifications.map((notification) => (
-					<TouchableOpacity
-						key={notification.id}
-						onPress={() => handlePress(notification.riskId!)}
-						style={styles.notificationBody}
-					>
-						<View style={{ flex: 1, gap: 4 }}>
-							<ThemedText style={styles.notificationTitle}>{notification.title}</ThemedText>
-							<ThemedText style={styles.notificationDate}>
-								{safeTimestampToDateTimeString(new Date(notification.date))}
-							</ThemedText>
-							<ThemedText style={styles.notificationText}>{notification.body}</ThemedText>
-						</View>
-						<ThemedIcon
-							name="chevron-right"
-							size={25}
+			{notifications && notifications.length > 0 && notifications.some((n) => !n.read) ? (
+				notifications
+					.filter((notification) => !notification.read)
+					.map((notification) => (
+						<NotificationItem
+							key={notification.id}
+							notification={notification}
+							darkMode={darkMode}
+							onPress={() => handlePress(notification.riskId!)}
+							showChevron
+							compact
 						/>
-					</TouchableOpacity>
-				))
+					))
 			) : (
-				<ThemedText style={styles.notificationTitle}>Henüz bildirim yok.</ThemedText>
+				<ThemedText style={styles.notificationText}>Henüz bildirim yok.</ThemedText>
+			)}
+
+			{notifications && notifications.length > 0 && notifications.some((n) => !n.read) && (
+				<TouchableOpacity
+					style={styles.seeMoreButton}
+					onPress={() => navigation.navigate("NotificationsScreen")}
+				>
+					<ThemedText style={styles.seeMore}>Tüm Bildirimler</ThemedText>
+					<ThemedIcon
+						name="chevron-right"
+						size={21}
+						style={{ marginTop: 2 }}
+					/>
+				</TouchableOpacity>
 			)}
 		</View>
 	)
@@ -72,12 +101,14 @@ const createStyles = (darkMode: boolean) => {
 			borderColor: theme.border,
 			backgroundColor: theme.cardBackground,
 			padding: 16,
+			paddingBottom: 10,
 			gap: 8,
 		},
 		notificationHeader: {
 			flexDirection: "row",
 			alignItems: "center",
 			gap: 8,
+			marginBottom: 8,
 		},
 		notificationTitle: {
 			fontSize: 16,
@@ -105,6 +136,16 @@ const createStyles = (darkMode: boolean) => {
 		notificationDate: {
 			fontSize: 12,
 			marginBottom: 5,
+		},
+		seeMoreButton: {
+			flexDirection: "row",
+			alignItems: "center",
+			justifyContent: "flex-end",
+			marginTop: 5,
+		},
+		seeMore: {
+			fontSize: 14,
+			fontWeight: "700",
 		},
 	})
 }

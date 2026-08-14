@@ -13,16 +13,25 @@ const messaging = getMessaging()
 
 setGlobalOptions({ maxInstances: 10 })
 
+const severityLabels: Record<string, string> = {
+	low: "Düşük",
+	medium: "Orta",
+	high: "Yüksek",
+	critical: "Kritik",
+}
+
 async function sendNotificationToTokens(
 	tokens: string[],
 	title: string,
 	body: string,
 	riskId: string,
+	severity: RiskSeverity,
 ): Promise<void> {
 	if (tokens.length === 0) {
 		logger.info("Skipping notification because no valid FCM tokens were found.", {
 			riskId,
 			title,
+			severity,
 		})
 		return
 	}
@@ -34,13 +43,17 @@ async function sendNotificationToTokens(
 		const chunk = tokens.slice(i, i + chunkSize)
 		const result = await messaging.sendEachForMulticast({
 			tokens: chunk,
-			notification: {title, body},
-			data: {riskId},
+			notification: { title, body },
+			data: { riskId, severity },
+			android: {
+				priority: "high",
+			},
 		})
 
 		logger.info("FCM notification batch sent.", {
 			riskId,
 			title,
+			severity,
 			totalInBatch: chunk.length,
 			successCount: result.successCount,
 			failureCount: result.failureCount,
@@ -61,11 +74,12 @@ export const onRiskWrite = onDocumentWritten(`${COLLECTIONS.RISKS}/{riskId}`, as
 	// The data that we are wathcing for is changed
 	const afterData = event.data?.after.data() as RiskDocument | undefined
 	if (!afterData) {
-		logger.warn("Risk document data is empty after write.", {riskId})
+		logger.warn("Risk document data is empty after write.", { riskId })
 		return
 	}
 
 	const afterStatus = afterData.status
+	const afterSeverity = afterData.severity
 
 	// ===================================================================
 	// 1) New risk created -> notify all admins.
@@ -77,9 +91,10 @@ export const onRiskWrite = onDocumentWritten(`${COLLECTIONS.RISKS}/{riskId}`, as
 			const adminTokens = await getAdminTokens()
 			await sendNotificationToTokens(
 				adminTokens,
-				"Yeni Kayıt Bildirimi",
-				"Sisteme yeni bir risk bildirimi eklendi.",
+				"Sisteme yeni risk eklendi",
+				"Risk Derecesi: " + severityLabels[afterSeverity],
 				riskId,
+				afterSeverity,
 			)
 		}
 		return
@@ -111,8 +126,9 @@ export const onRiskWrite = onDocumentWritten(`${COLLECTIONS.RISKS}/{riskId}`, as
 		await sendNotificationToTokens(
 			[assignedToken],
 			"Yeni Görev Ataması",
-			"Size yeni bir görev atandı.",
+			"Risk Derecesi: " + severityLabels[afterSeverity],
 			riskId,
+			afterSeverity,
 		)
 		return
 	}
@@ -129,6 +145,7 @@ export const onRiskWrite = onDocumentWritten(`${COLLECTIONS.RISKS}/{riskId}`, as
 			"Görev Tamamlandı",
 			"Bir personel görevini tamamladı ve onayınızı bekliyor.",
 			riskId,
+			afterSeverity,
 		)
 		return
 	}
@@ -153,6 +170,7 @@ export const onRiskWrite = onDocumentWritten(`${COLLECTIONS.RISKS}/{riskId}`, as
 			"Bildirim Kapatıldı",
 			"Açtığınız risk bildirimi çözüldü ve kapatıldı.",
 			riskId,
+			afterSeverity,
 		)
 	}
 })

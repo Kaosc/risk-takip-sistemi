@@ -12,6 +12,7 @@
 - add 2 bottomsheet to risksScreen to filter risks by status and risk severity instead of tabbar
 - add floating button to risks screen to add risk  (maybe remove the add risk button from home screen)
 - pressing a risk status from homescreen navigates user to risks screen but filter does not apply fix it.
+- a progression card in the RiskDetailsScreen where shows the current stage of the risk like a progress bar and the current stage name and the next stage name
 
 # ?
    - Should staff or admin be able add risk?

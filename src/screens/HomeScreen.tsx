@@ -44,6 +44,14 @@ export default function HomeScreen() {
 			<CustomHeader
 				title="Risk Takip Sistemi"
 				showBackButton={false}
+				rightComponent={
+					<TouchableOpacity onPress={() => navigation.navigate("NotificationsScreen")}>
+						<ThemedIcon
+							name="bell"
+							size={25}
+						/>
+					</TouchableOpacity>
+				}
 			/>
 
 			<ScrollView
@@ -91,7 +99,7 @@ export default function HomeScreen() {
 						</TouchableOpacity>
 					</View>
 
-						<NotificationsCard />
+					<NotificationsCard />
 					<RiskStatusCounts />
 				</View>
 
