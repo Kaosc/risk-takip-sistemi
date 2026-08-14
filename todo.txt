@@ -1,0 +1,18 @@
+- Notification screen + notification badge to home screen top right
+- show read un read notification count on home screen top right and notifications card
+- add a different card ui for unread notifications and read notifications
+- add "read all" bıtton to notificationCard
+- homescreen notificatin badge ui changes
+- send risk category and severity and maybe some other content along with notification payload to show it on notification item card
+- send notification to user who created the risk on every status changes
+- test notifications for STAFF
+- add fullscreen image modal for risk images when its clicked
+- when a risk completed show all the risk details like after images, description added by staff and admin in details screen for every role
+- stack search screen for risk screen  
+- add 2 bottomsheet to risksScreen to filter risks by status and risk severity instead of tabbar
+- add floating button to risks screen to add risk  (maybe remove the add risk button from home screen)
+- pressing a risk status from homescreen navigates user to risks screen but filter does not apply fix it.
+
+# ?
+   - Should staff or admin be able add risk?
+   - or staff just see what assigned to them?
