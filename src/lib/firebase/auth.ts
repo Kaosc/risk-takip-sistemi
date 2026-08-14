@@ -56,7 +56,6 @@ export const register = async (email: string, password: string, name: string) =>
 	let uid: string | null = null
 	try {
 		const credential = await createUserWithEmailAndPassword(auth, email, password)
-		console.log(credential)
 
 		if (!credential.user) {
 			throw new Error("Hesap oluşturulamadı. Lütfen tekrar deneyin.")

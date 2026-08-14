@@ -18,7 +18,6 @@ export default function NotificationsCard() {
 	const [notifications, setNotifications] = useMMKVObject<NotificationData[]>("latestNotifications")
 
 	const handlePress = (riskId: string | object) => {
-		console.log({ riskId })
 		navigation.navigate("RiskDetailsScreen", { riskId })
 
 		// TODO: Uncomment after testings done

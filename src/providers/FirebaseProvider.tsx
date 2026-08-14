@@ -33,8 +33,6 @@ export default function FirebaseProvider({ children }: { children: React.ReactNo
 
 	useEffect(() => {
 		const unsubscribe = messaging.onMessage(async (remoteMessage) => {
-			console.log("Foreground notification received:", remoteMessage.messageId)
-
 			try {
 				let newNotifications = notifications || []
 

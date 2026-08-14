@@ -16,8 +16,6 @@ import i18n from "./i18n"
 import App from "./App"
 
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-	console.log("Arka planda bildirim yakalandı:", remoteMessage.messageId)
-
 	try {
 		let notifications = getLatestNotifications()
 

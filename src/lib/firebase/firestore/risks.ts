@@ -46,8 +46,6 @@ export const addRisk = async (riskData: Partial<Risk>) => {
 			updatedAt: serverTimestamp(),
 		})
 
-		console.log("Risk başarıyla eklendi, ID:", docRef.id)
-
 		return { success: true, id: docRef.id }
 	} catch (error: any) {
 		console.error("Risk eklenirken hata oluştu:", error)
