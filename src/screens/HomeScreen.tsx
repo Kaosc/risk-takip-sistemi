@@ -6,12 +6,13 @@ import { Image } from "expo-image"
 import ThemedText from "../components/ui/ThemedText"
 import ThemedButton from "../components/ui/ThemedButton"
 import ThemedIcon from "../components/ui/ThemedIcon"
+import NotificationsCard from "../components/NotificationsCard"
+import { RiskStatusCounts } from "../components/CountsCard"
 import CustomHeader from "../components/CustomHeader"
 
 import { Theme } from "../utils/theme"
 import { logout } from "../lib/firebase/auth"
 import { clearUser } from "../utils/storage"
-import { RiskStatusCounts } from "../components/CountsCard"
 
 const getInitials = (name?: string) =>
 	name
@@ -90,18 +91,7 @@ export default function HomeScreen() {
 						</TouchableOpacity>
 					</View>
 
-					{/* ===== Latest Notification Card ===== */}
-					<View style={styles.notificationCard}>
-						<View style={styles.notificationHeader}>
-							<ThemedIcon
-								name="bell-ring-outline"
-								size={22}
-							/>
-							<ThemedText style={styles.notificationTitle}>Son Bildirimler</ThemedText>
-						</View>
-						<ThemedText style={styles.notificationBody}>Henüz bildirim yok.</ThemedText>
-					</View>
-
+						<NotificationsCard />
 					<RiskStatusCounts />
 				</View>
 
@@ -191,28 +181,6 @@ const createStyles = (darkMode: boolean) => {
 		profileEmail: {
 			fontSize: 13,
 			opacity: 0.7,
-		},
-		notificationCard: {
-			borderRadius: 16,
-			borderWidth: 1,
-			borderColor: theme.border,
-			backgroundColor: theme.cardBackground,
-			padding: 16,
-			gap: 8,
-		},
-		notificationHeader: {
-			flexDirection: "row",
-			alignItems: "center",
-			gap: 8,
-		},
-		notificationTitle: {
-			fontSize: 16,
-			fontWeight: "700",
-		},
-		notificationBody: {
-			fontSize: 14,
-			opacity: 0.85,
-			lineHeight: 20,
 		},
 		primaryButton: {
 			marginTop: 6,

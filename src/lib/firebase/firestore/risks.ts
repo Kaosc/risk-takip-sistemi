@@ -12,6 +12,7 @@ import {
 	count,
 	getCountFromServer,
 	where,
+	getDoc,
 } from "@react-native-firebase/firestore"
 import { COLLECTIONS } from "../enums"
 
@@ -152,5 +153,21 @@ export const getRisksAssignedToStaff = async (staffId: string): Promise<Risk[]> 
 	} catch (error: any) {
 		console.error("Personel atanan riskler alınırken hata oluştu:", error)
 		return []
+	}
+}
+
+export const getRiskById = async (riskId: string): Promise<Risk | null> => {
+	try {
+		const riskDoc = await getDoc(doc(db, COLLECTIONS.RISKS, riskId))
+		const riskData = riskDoc.data() as Risk | undefined
+
+		if (!riskData) {
+			console.error("Risk bulunamadı:", riskId)
+			return null
+		}
+		return { ...riskData }
+	} catch (error: any) {
+		console.error("Risk alınırken hata oluştu:", error)
+		return null
 	}
 }

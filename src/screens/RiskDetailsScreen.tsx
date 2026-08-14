@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { Alert, Platform, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from "react-native"
 import { useSelector } from "react-redux"
-import { useRoute } from "@react-navigation/native"
 import { Image } from "expo-image"
 import * as ImagePicker from "expo-image-picker"
 import BottomSheet from "@gorhom/bottom-sheet"
@@ -10,7 +9,6 @@ import DateTimePicker from "@react-native-community/datetimepicker"
 import ThemedText from "../components/ui/ThemedText"
 import ThemedButton from "../components/ui/ThemedButton"
 import ThemedIcon from "../components/ui/ThemedIcon"
-import GradientCard from "../components/ui/GradientCard"
 import ThemedBottomSheet from "../components/ui/ThemedBottomSheet"
 import CustomHeader from "../components/CustomHeader"
 
@@ -18,7 +16,7 @@ import { safeTimestampToDateString } from "../utils/date"
 import { AllIconNames } from "../types/icon"
 import { Theme } from "../utils/theme"
 import { getStaffs } from "../lib/firebase/firestore/users"
-import { assignRiskToStaff, updateRisk, updateStatus } from "../lib/firebase/firestore/risks"
+import { assignRiskToStaff, getRiskById, getRisksByUserId, updateRisk, updateStatus } from "../lib/firebase/firestore/risks"
 import { uploadImages } from "../lib/firebase/storage"
 import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 import { serverTimestamp } from "@react-native-firebase/firestore"
@@ -126,15 +124,19 @@ function ThumbnailsRow({ images, onRemove }: { images: string[]; onRemove?: (ind
 		</ScrollView>
 	)
 }
-export default function RiskDetailsScreen() {
-	const route = useRoute() as any
-	const riskParam = route.params?.risk as Risk | undefined
+export default function RiskDetailsScreen({
+	route,
+}: {
+	route: {
+		params: { riskId?: string; risk?: Risk }
+	}
+}) {
 	const { role } = useSelector((state: RootState) => state.auth)
 
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const styles = createStyles(darkMode)
 
-	const [risk, setRisk] = useState<Risk>(riskParam ?? fallbackRisk)
+	const [risk, setRisk] = useState<Risk>(route?.params?.risk ?? fallbackRisk)
 	const [assignedStaff, setAssignedStaff] = useState("")
 	const [taskDescription, setTaskDescription] = useState("")
 	const [dueDate, setDueDate] = useState<Date | null>(null)
@@ -150,6 +152,23 @@ export default function RiskDetailsScreen() {
 	const sheetRef = useRef<BottomSheet | null>(null)
 
 	const setStatus = (status: RiskStatus) => setRisk((prev) => ({ ...prev, status }))
+
+	const fetchRiskDetails = async (riskId: string) => {
+		setLoading(true)
+		const fetchedRisk = await getRiskById(riskId)
+
+		if (fetchedRisk) {
+			setRisk(fetchedRisk)
+		}
+
+		setLoading(false)
+	}
+
+	useEffect(() => {
+		if (route.params?.riskId) {
+			fetchRiskDetails(route.params.riskId)
+		}
+	}, [route.params?.riskId])
 
 	const fetchStaffs = async () => {
 		if (role === "ADMIN") {
@@ -694,7 +713,7 @@ const createStyles = (darkMode: boolean) => {
 			borderRadius: 12,
 			alignItems: "center",
 			justifyContent: "center",
-			backgroundColor: theme.red.foreground,
+			backgroundColor: theme.red.fg,
 			borderWidth: 2,
 			borderColor: darkMode ? "#000" : "#fff",
 		},
@@ -711,7 +730,7 @@ const createStyles = (darkMode: boolean) => {
 		},
 		errorText: {
 			fontSize: 12,
-			color: theme.red.foreground,
+			color: theme.red.fg,
 		},
 		secondaryButton: {
 			backgroundColor: darkMode ? "#1c1c1c" : "#f2f2f2",

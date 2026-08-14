@@ -180,7 +180,8 @@ export default function RisksScreen({
 		<ScrollView
 			horizontal
 			style={styles.tabRow}
-			contentContainerStyle={{ flexGrow: 1, justifyContent: "space-around", paddingHorizontal: 5, gap: 8 }}
+			contentContainerStyle={{ flexGrow: 1, justifyContent: "space-around", gap: 10 }}
+			showsHorizontalScrollIndicator={false}
 		>
 			{(["new", "inprogress", "pending", "completed"] as RiskStatus[]).map((status) => (
 				<TouchableOpacity
@@ -213,12 +214,13 @@ export default function RisksScreen({
 	return (
 		<View style={styles.container}>
 			<CustomHeader title={role === "ADMIN" ? "Raporlar" : "Raporlarım"} />
-			<TabButtons />
 			<FlatList
 				data={filteredRisks}
 				keyExtractor={(item) => item.id}
 				renderItem={renderItem}
+				style={styles.list}
 				contentContainerStyle={styles.listContent}
+				ListHeaderComponent={<TabButtons />}
 				showsVerticalScrollIndicator={false}
 				ListEmptyComponent={
 					<View style={styles.emptyContainer}>
@@ -240,7 +242,11 @@ const createStyles = (darkMode: boolean) => {
 
 	return StyleSheet.create({
 		container: {
+			flex: 1,
 			backgroundColor: theme.background,
+		},
+		list: {
+			flex: 1,
 		},
 		loadingContainer: {
 			flex: 1,
@@ -249,15 +255,14 @@ const createStyles = (darkMode: boolean) => {
 			backgroundColor: theme.background,
 		},
 		listContent: {
-			padding: 16,
-			paddingBottom: 24,
 			gap: 12,
 			flexGrow: 1,
-			height: "100%",
+			paddingBottom: BOTTOM_TAB_HEIGHT,
 		},
 		cardWrapper: {
 			borderRadius: 16,
 			overflow: "hidden",
+			marginHorizontal: 18,
 		},
 		tabRow: {
 			paddingVertical: 12,

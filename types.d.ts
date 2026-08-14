@@ -124,3 +124,22 @@ type MemberFormData = {
 		firstAidProvided: boolean
 	}
 }
+
+type NotificationPayload = {
+	notification: {
+		title: string
+		body: string
+	}
+	data: {
+		riskId: string
+	}
+}
+
+type NotificationData = {
+	id: string | undefined
+	title: string
+	body: string
+	date: string
+	riskId: string | object | undefined
+	read: boolean
+}

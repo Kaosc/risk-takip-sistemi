@@ -27,7 +27,9 @@ async function sendNotificationToTokens(
 		return
 	}
 
+	// We can only send notifications to a maximum of 500 tokens at once
 	const chunkSize = 500
+
 	for (let i = 0; i < tokens.length; i += chunkSize) {
 		const chunk = tokens.slice(i, i + chunkSize)
 		const result = await messaging.sendEachForMulticast({

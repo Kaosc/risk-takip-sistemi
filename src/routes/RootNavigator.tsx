@@ -26,7 +26,7 @@ export default function RootNavigator() {
 			/>
 			<Stack.Screen
 				name="RiskDetailsScreen"
-				component={RiskDetailsScreen}
+				component={RiskDetailsScreen as any}
 			/>
 			<Stack.Screen
 				name="SettingsScreen"

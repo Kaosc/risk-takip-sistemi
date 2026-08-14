@@ -2,6 +2,10 @@ import { createMMKV } from "react-native-mmkv"
 
 export const storage = createMMKV()
 
+export const storeLatestNotifications = (notifications: NotificationData[]) =>
+	storage.set("latestNotifications", JSON.stringify(notifications))
+export const getLatestNotifications = (): NotificationData[] => JSON.parse(storage.getString("latestNotifications") || "[]")
+
 export const storeAutoTheme = () => storage.set("autoTheme", true)
 export const getIsThemeAuto = () => storage.getBoolean("autoTheme")
 
