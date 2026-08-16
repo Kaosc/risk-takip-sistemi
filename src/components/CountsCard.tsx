@@ -102,17 +102,17 @@ export const RiskStatusCounts = () => {
 
 	// first show how many task assigned to this staff and how many is wating for to work (status === "inprogress") with different full width card
 	// and blow 3 boxes which will show count of inprogress, pending and completed tasks for this staff
-	if (role === "STAFF") {
+	if (role === "STAFF" || role === "ADMIN") {
 		return (
 			<Container>
 				<TouchableOpacity
 					activeOpacity={0.7}
-					onPress={() => handleNavigateToStatus("inprogress")}
+					onPress={() => handleNavigateToStatus(role === "ADMIN" ? "new" : "inprogress")}
 					style={[
 						styles.row,
 						{
-							backgroundColor: theme.blue.bg,
-							borderColor: theme.blue.fg + "88",
+							backgroundColor: role === "ADMIN" ? theme.primary.bg : theme.blue.bg,
+							borderColor: role === "ADMIN" ? theme.primary.fg : theme.blue.fg,
 							borderWidth: 1,
 							padding: 10,
 							borderRadius: 12,
@@ -128,30 +128,41 @@ export const RiskStatusCounts = () => {
 								name="clipboard-text-outline"
 								size={22}
 							/>
-							<ThemedText style={{ fontSize: 14, fontWeight: "bold" }}>{"Atanan Görevler"}</ThemedText>
+							<ThemedText style={{ fontSize: 14, fontWeight: "bold" }}>{role === "STAFF" ? "Atanan Görevler" : "İncelenmeyi Bekleyen Riskler"}</ThemedText>
 						</View>
 
-						<View style={{ flex: 1, justifyContent: "center" }}>
-							{counts?.inprogress ? (
-								<ThemedText style={{ fontSize: 15 }}>İncelenmeyi bekleyen {counts?.inprogress || 0} görev var</ThemedText>
-							) : (
-								<ThemedText style={{ fontSize: 15 }}>Atanamış hiç görev yok</ThemedText>
-							)}
-						</View>
+						{role === "STAFF" ? (
+							<View style={{ flex: 1, justifyContent: "center" }}>
+								{counts?.inprogress ? (
+									<ThemedText style={{ fontSize: 15 }}>İlgilenilmesi gereken {counts?.inprogress || 0} görev var</ThemedText>
+								) : (
+									<ThemedText style={{ fontSize: 15 }}>Atanamış hiç görev yok</ThemedText>
+								)}
+							</View>
+						) : (
+							<View style={{ flex: 1, justifyContent: "center" }}>
+								{counts?.new ? (
+									<ThemedText style={{ fontSize: 15 }}>İncelenmeyi bekleyen {counts?.new || 0} risk var</ThemedText>
+								) : (
+									<ThemedText style={{ fontSize: 15 }}>İncelenmeyi bekleyen hiç risk yok</ThemedText>
+								)}
+							</View>
+						)}
 					</View>
 
-					{counts?.inprogress ? (
-						<ThemedText style={{ fontSize: 25, fontWeight: "bold" }}>{counts?.inprogress || 0}</ThemedText>
+					{(role === "STAFF" && counts?.inprogress) || (role === "ADMIN" && counts?.new) ? (
+						<ThemedText style={{ fontSize: 25, fontWeight: "bold" }}>{counts?.inprogress || counts?.new || 0}</ThemedText>
 					) : (
 						<ThemedIcon
 							name="check-circle-outline"
 							size={25}
-							color={theme.blue.fg}
+							color={role === "STAFF" ? theme.blue.fg : theme.primary.fg}
 						/>
 					)}
 				</TouchableOpacity>
 
 				<View style={styles.row}>
+					{role === "ADMIN" && <Box card={cards[1]} />}
 					<Box card={cards[2]} />
 					<Box card={cards[3]} />
 				</View>
@@ -161,7 +172,7 @@ export const RiskStatusCounts = () => {
 
 	// For MEMBER & ADMIN
 	return (
-		<View style={styles.container}>
+		<Container>
 			<View style={styles.row}>
 				<Box card={cards[0]} />
 				<Box card={cards[1]} />
@@ -170,7 +181,7 @@ export const RiskStatusCounts = () => {
 				<Box card={cards[2]} />
 				<Box card={cards[3]} />
 			</View>
-		</View>
+		</Container>
 	)
 }
 

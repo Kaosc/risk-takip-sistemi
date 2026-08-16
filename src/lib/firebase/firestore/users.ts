@@ -68,7 +68,7 @@ export const assignFCMTokenToUser = async (): Promise<string | null> => {
 
 		if (userSnap.exists()) {
 			const userData = userSnap.data()
-			
+
 			if (userData.fcmToken !== currentToken) {
 				await updateDoc(userRef, {
 					fcmToken: currentToken,
@@ -81,5 +81,23 @@ export const assignFCMTokenToUser = async (): Promise<string | null> => {
 	} catch (error) {
 		console.debug("[FIRESTORE] assignFCMTokenToUser error:", error)
 		return null
+	}
+}
+
+export const deleteUserFCMToken = async (): Promise<void> => {
+	try {
+		const user = auth.currentUser
+		if (!user) {
+			console.debug("[FIRESTORE] deleteUserFCMToken: No authenticated user found.")
+			return
+		}
+
+		const userRef = doc(db, COLLECTIONS.USERS, user.uid)
+		await updateDoc(userRef, {
+			fcmToken: null,
+		})
+		console.debug("[FIRESTORE] deleteUserFCMToken: FCM Token deleted from Firestore.")
+	} catch (error) {
+		console.debug("[FIRESTORE] deleteUserFCMToken error:", error)
 	}
 }

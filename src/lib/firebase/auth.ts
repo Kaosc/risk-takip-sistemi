@@ -10,7 +10,7 @@ import {
 import { getFirestore, doc, getDoc } from "@react-native-firebase/firestore"
 
 import { COLLECTIONS } from "./enums"
-import { addUser, assignFCMTokenToUser } from "./firestore/users"
+import { addUser, assignFCMTokenToUser, deleteUserFCMToken } from "./firestore/users"
 
 const auth = getAuth()
 const db = getFirestore()
@@ -118,6 +118,7 @@ export const resetPassword = async (email: string): Promise<boolean> => {
 
 export const logout = async (): Promise<void> => {
 	try {
+		await deleteUserFCMToken()
 		await signOut(auth)
 	} catch (e: any) {
 		console.debug("[AUTH] logoutUser:", e?.message || e)
