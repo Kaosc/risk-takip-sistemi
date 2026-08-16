@@ -169,3 +169,14 @@ export const getRiskById = async (riskId: string): Promise<Risk | null> => {
 		return null
 	}
 }
+
+export const deleteRiskById = async (riskId: string): Promise<{ success: boolean; error?: string }> => {
+	try {
+		await deleteDoc(doc(db, COLLECTIONS.RISKS, riskId))
+		return { success: true }
+	}
+	catch (error: any) {
+		console.error("Risk silinirken hata oluştu:", error)
+		return { success: false, error: error.message }
+	}
+}

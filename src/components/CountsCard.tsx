@@ -141,6 +141,7 @@ export const RiskStatusCounts = () => {
 							flexDirection: "row",
 							justifyContent: "space-between",
 							alignItems: "center",
+							paddingHorizontal: 14,
 						},
 					]}
 				>
@@ -175,7 +176,7 @@ export const RiskStatusCounts = () => {
 					</View>
 
 					{(role === "STAFF" && counts?.inprogress) || (role === "ADMIN" && counts?.new) ? (
-						<ThemedText style={{ fontSize: 25, fontWeight: "bold" }}>{counts?.inprogress || counts?.new || 0}</ThemedText>
+						<ThemedText style={{ fontSize: 25, fontWeight: "bold" }}>{role === "STAFF" ? counts?.inprogress : counts?.new}</ThemedText>
 					) : (
 						<ThemedIcon
 							name="check-circle-outline"

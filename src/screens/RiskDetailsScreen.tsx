@@ -5,6 +5,7 @@ import { Image } from "expo-image"
 import * as ImagePicker from "expo-image-picker"
 import BottomSheet from "@gorhom/bottom-sheet"
 import DateTimePicker from "@react-native-community/datetimepicker"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
 
 import ThemedText from "../components/ui/ThemedText"
 import ThemedButton from "../components/ui/ThemedButton"
@@ -17,7 +18,7 @@ import { safeTimestampToDateString } from "../utils/date"
 import { AllIconNames } from "../types/icon"
 import { Theme } from "../utils/theme"
 import { getStaffs } from "../lib/firebase/firestore/users"
-import { assignRiskToStaff, getRiskById, updateRisk, updateStatus } from "../lib/firebase/firestore/risks"
+import { assignRiskToStaff, deleteRiskById, getRiskById, updateRisk, updateStatus } from "../lib/firebase/firestore/risks"
 import { uploadImages } from "../lib/firebase/storage"
 import { serverTimestamp } from "@react-native-firebase/firestore"
 import { useTranslation } from "react-i18next"
@@ -244,6 +245,7 @@ export default function RiskDetailsScreen({
 	}
 }) {
 	const { role } = useSelector((state: RootState) => state.auth)
+	const navigation = useNavigation() as NavigationProp<any>
 	const { t } = useTranslation()
 
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
@@ -738,6 +740,25 @@ export default function RiskDetailsScreen({
 				</View>
 
 				<RenderRoleSection />
+
+				{role === "ADMIN" && (
+					<ThemedButton
+						text="Kaydı Sil"
+						icon="trash-can-outline"
+						onPress={() => {
+							deleteRiskById(risk.id)
+							navigation.goBack()
+						}}
+						style={{
+							marginVertical: 12,
+							backgroundColor: theme.red.bg,
+							borderColor: theme.red.fg,
+							borderWidth: 1,
+						}}
+						iconColor={theme.red.fg}
+						textStyle={{ color: theme.red.fg }}
+					/>
+				)}
 			</ScrollView>
 
 			<ThemedBottomSheet

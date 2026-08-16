@@ -60,9 +60,10 @@ export default function NotificationsCard() {
 			{notifications && notifications.length > 0 && notifications.some((n) => !n.read) ? (
 				notifications
 					.filter((notification) => !notification.read)
-					.map((notification) => (
+					.slice(0, 2)
+					.map((notification, index) => (
 						<NotificationItem
-							key={notification.id}
+							key={index}
 							notification={notification}
 							darkMode={darkMode}
 							onPress={() => handlePress(notification.riskId!)}
