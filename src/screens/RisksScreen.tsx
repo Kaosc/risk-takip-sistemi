@@ -50,9 +50,11 @@ export default function RisksScreen({
 		}, [route.params?.status, navigation]),
 	)
 
-	useEffect(() => {
-		fetchRisks()
-	}, [])
+	useFocusEffect(
+		useCallback(() => {
+			fetchRisks()
+		}, []),
+	)
 
 	const fetchRisks = async () => {
 		setLoading(true)

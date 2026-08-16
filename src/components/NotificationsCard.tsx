@@ -57,9 +57,9 @@ export default function NotificationsCard() {
 				<ThemedText style={styles.notificationTitle}>Son Bildirimler</ThemedText>
 			</View>
 
-			{notifications && notifications.length > 0 && notifications.some((n) => !n.read) ? (
+			{notifications && notifications.length > 0 && notifications.some((n) => !n?.read) ? (
 				notifications
-					.filter((notification) => !notification.read)
+					.filter((notification) => !notification?.read)
 					.slice(0, 2)
 					.map((notification, index) => (
 						<NotificationItem
@@ -75,7 +75,7 @@ export default function NotificationsCard() {
 				<ThemedText style={styles.notificationText}>Henüz bildirim yok.</ThemedText>
 			)}
 
-			{notifications && notifications.length > 0 && notifications.some((n) => !n.read) && (
+			{notifications && notifications.length > 0 && notifications.some((n) => !n?.read) && (
 				<TouchableOpacity
 					style={styles.seeMoreButton}
 					onPress={() => navigation.navigate("NotificationsScreen")}
