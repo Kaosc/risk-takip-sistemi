@@ -25,7 +25,7 @@ async function sendNotificationToTokens(
 	title: string,
 	body: string,
 	riskId: string,
-	severity: RiskSeverity,
+	severity?: string,
 ): Promise<void> {
 	if (tokens.length === 0) {
 		logger.info("Skipping notification because no valid FCM tokens were found.", {
@@ -44,9 +44,21 @@ async function sendNotificationToTokens(
 		const result = await messaging.sendEachForMulticast({
 			tokens: chunk,
 			notification: { title, body },
-			data: { riskId, severity },
+			data: {
+				riskId: String(riskId || ""),
+				severity: String(severity || "low"),
+				title: String(title),
+				body: String(body),
+			},
 			android: {
 				priority: "high",
+			},
+			apns: {
+				payload: {
+					aps: {
+						contentAvailable: true,
+					},
+				},
 			},
 		})
 
@@ -71,7 +83,6 @@ export const onRiskWrite = onDocumentWritten(`${COLLECTIONS.RISKS}/{riskId}`, as
 		return
 	}
 
-	// The data that we are wathcing for is changed
 	const afterData = event.data?.after.data() as RiskDocument | undefined
 	if (!afterData) {
 		logger.warn("Risk document data is empty after write.", { riskId })
@@ -79,20 +90,19 @@ export const onRiskWrite = onDocumentWritten(`${COLLECTIONS.RISKS}/{riskId}`, as
 	}
 
 	const afterStatus = afterData.status
-	const afterSeverity = afterData.severity
+	const afterSeverity = afterData.severity || "medium"
+	const severityText = severityLabels[afterSeverity] || "Belirtilmedi"
 
 	// ===================================================================
 	// 1) New risk created -> notify all admins.
 	// ===================================================================
-
 	if (!beforeExists) {
-		// 1) Newly created risk with status "new" -> notify all admins.
 		if (afterStatus === "new") {
 			const adminTokens = await getAdminTokens()
 			await sendNotificationToTokens(
 				adminTokens,
 				"Sisteme yeni risk eklendi",
-				"Risk Derecesi: " + severityLabels[afterSeverity],
+				"Risk Derecesi: " + severityText,
 				riskId,
 				afterSeverity,
 			)
@@ -111,9 +121,7 @@ export const onRiskWrite = onDocumentWritten(`${COLLECTIONS.RISKS}/{riskId}`, as
 	// ===================================================================
 	// 2) Admin assigned task to staff -> notify the assigned staff.
 	// ===================================================================
-
 	if (afterStatus === "inprogress") {
-		// 2) Admin assigned task to staff.
 		const assignedToken = await getUserTokenByUid(afterData.assignedToId)
 		if (!assignedToken) {
 			logger.info("Assigned user has no valid FCM token; notification skipped.", {
@@ -123,22 +131,14 @@ export const onRiskWrite = onDocumentWritten(`${COLLECTIONS.RISKS}/{riskId}`, as
 			return
 		}
 
-		await sendNotificationToTokens(
-			[assignedToken],
-			"Yeni Görev Ataması",
-			"Risk Derecesi: " + severityLabels[afterSeverity],
-			riskId,
-			afterSeverity,
-		)
+		await sendNotificationToTokens([assignedToken], "Yeni Görev Ataması", "Risk Derecesi: " + severityText, riskId, afterSeverity)
 		return
 	}
 
 	// ===================================================================
 	// 3) Staff completed task -> notify all admins for approval.
 	// ===================================================================
-
 	if (afterStatus === "pendingVerification") {
-		// 3) Staff completed task -> notify all admins for approval.
 		const adminTokens = await getAdminTokens()
 		await sendNotificationToTokens(
 			adminTokens,
@@ -153,9 +153,7 @@ export const onRiskWrite = onDocumentWritten(`${COLLECTIONS.RISKS}/{riskId}`, as
 	// ===================================================================
 	// 4) Admin closed/approved -> notify the original member.
 	// ===================================================================
-
 	if (afterStatus === "completed") {
-		// 4) Admin closed/approved -> notify the original member.
 		const creatorToken = await getUserTokenByUid(afterData.createdBy)
 		if (!creatorToken) {
 			logger.info("Risk creator has no valid FCM token; notification skipped.", {
@@ -168,7 +166,7 @@ export const onRiskWrite = onDocumentWritten(`${COLLECTIONS.RISKS}/{riskId}`, as
 		await sendNotificationToTokens(
 			[creatorToken],
 			"Bildirim Kapatıldı",
-			"Açtığınız risk bildirimi çözüldü ve kapatıldı.",
+			"Açtığınız risk bildirimi çözüldü ve onaylandı.",
 			riskId,
 			afterSeverity,
 		)

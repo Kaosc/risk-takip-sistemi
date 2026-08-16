@@ -1,0 +1,93 @@
+[debug] [2026-08-16T15:19:25.011Z] ----------------------------------------------------------------------
+[debug] [2026-08-16T15:19:25.013Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Kaosc\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js functions:shell
+[debug] [2026-08-16T15:19:25.013Z] CLI Version:   15.26.0
+[debug] [2026-08-16T15:19:25.013Z] Platform:      win32
+[debug] [2026-08-16T15:19:25.013Z] Node Version:  v24.16.0
+[debug] [2026-08-16T15:19:25.013Z] Detected Agent: unknown
+[debug] [2026-08-16T15:19:25.013Z] Time:          Sun Aug 16 2026 18:19:25 GMT+0300 (Türkiye Standard Time)
+[debug] [2026-08-16T15:19:25.014Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-08-16T15:19:25.778Z] Object "" in "firebase.json" has unknown property: {"additionalProperty":"react-native"}
+[debug] [2026-08-16T15:19:25.782Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-08-16T15:19:25.782Z] > authorizing via signed-in user (kaosc.mail@gmail.com)
+[debug] [2026-08-16T15:19:25.782Z] [iam] checking project risk-track-system for permissions ["firebase.projects.get"]
+[debug] [2026-08-16T15:19:25.792Z] Checked if tokens are valid: true, expires at: 1786896521980
+[debug] [2026-08-16T15:19:25.792Z] Checked if tokens are valid: true, expires at: 1786896521980
+[debug] [2026-08-16T15:19:25.792Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/risk-track-system:testIamPermissions [none]
+[debug] [2026-08-16T15:19:25.792Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/risk-track-system:testIamPermissions  x-goog-user-project=risk-track-system
+[debug] [2026-08-16T15:19:25.793Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/risk-track-system:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2026-08-16T15:19:27.032Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/risk-track-system:testIamPermissions 200
+[debug] [2026-08-16T15:19:27.033Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/risk-track-system:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2026-08-16T15:19:27.036Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-08-16T15:19:27.287Z] defaultcredentials: writing to file C:\Users\Kaosc\AppData\Roaming\firebase\kaosc_mail_gmail.com_application_default_credentials.json
+[debug] [2026-08-16T15:19:27.288Z] DEBUG: Setting GAC to C:\Users\Kaosc\AppData\Roaming\firebase\kaosc_mail_gmail.com_application_default_credentials.json
+[debug] [2026-08-16T15:19:27.288Z] Checked if tokens are valid: true, expires at: 1786896521980
+[debug] [2026-08-16T15:19:27.288Z] Checked if tokens are valid: true, expires at: 1786896521980
+[debug] [2026-08-16T15:19:27.288Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/risk-track-system/adminSdkConfig [none]
+[debug] [2026-08-16T15:19:28.139Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/risk-track-system/adminSdkConfig 200
+[debug] [2026-08-16T15:19:28.139Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/risk-track-system/adminSdkConfig {"projectId":"risk-track-system","storageBucket":"risk-track-system.firebasestorage.app"}
+[debug] [2026-08-16T15:19:28.146Z] [functions] Watching "E:\dev\risk-takip-sistemi\functions" for Cloud Functions...
+[debug] [2026-08-16T15:19:28.147Z] Validating nodejs source
+[debug] [2026-08-16T15:19:29.129Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "24"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.0",
+    "firebase-functions-test": "^3.4.1"
+  },
+  "private": true
+}
+[debug] [2026-08-16T15:19:29.129Z] Building nodejs source
+[debug] [2026-08-16T15:19:29.130Z] Failed to find version of module node: reached end of search path E:\dev\risk-takip-sistemi\functions\node_modules
+[info] +  functions: Using node@24 from host. 
+[debug] [2026-08-16T15:19:29.131Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-08-16T15:19:29.137Z] Found firebase-functions binary at 'E:\dev\risk-takip-sistemi\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8825
+
+[debug] [2026-08-16T15:19:29.475Z] Got response from /__/functions.yaml {"endpoints":{"onRiskWrite":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.written","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"risks/{riskId}"},"retry":false},"entryPoint":"onRiskWrite"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[debug] [2026-08-16T15:19:32.508Z] [functions] Loaded functions definitions from source: onRiskWrite.
+[debug] [2026-08-16T15:19:32.509Z] [functions[us-central1-onRiskWrite]] function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions: Loaded functions: onRiskWrite 
+[warn] !  functions: The following emulators are not running, calls to these services will affect production: firestore, database, pubsub, storage, eventarc, tasks 
+[debug] [2026-08-16T15:19:36.756Z] shell:onRiskWrite: trigger={"entryPoint":"onRiskWrite","platform":"gcfv2","region":"us-central1","name":"onRiskWrite","id":"us-central1-onRiskWrite","codebase":"default","availableMemoryMb":256,"labels":{"EVENTARC_CLOUD_EVENT_SOURCE":"run-emulated.googleapis.com/projects/risk-track-system/locations/us-central1/services/onRiskWrite"},"timeoutSeconds":60,"secretEnvironmentVariables":[],"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.written","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"risks/{riskId}"}}}
+[debug] [2026-08-16T15:19:36.756Z] shell:onRiskWrite: opts={"params":{"riskId":"test_risk_123"},"resource":"risks/test_risk_123"}, data={"value":{"fields":{"status":{"stringValue":"new"},"severity":{"stringValue":"high"},"title":{"stringValue":"Yangın Tüpü Eksik"},"location":{"stringValue":"A Blok Kat 2"}},"createTime":"2026-08-16T15:19:36.755Z","updateTime":"2026-08-16T15:19:36.755Z"},"oldValue":{}}
+[debug] [2026-08-16T15:19:36.765Z] DEBUG: [worker-pool] addWorker(us-central1-onRiskWrite)
+[debug] [2026-08-16T15:19:36.765Z] DEBUG: [worker-pool] Adding worker with key us-central1-onRiskWrite, total=1
+[debug] [2026-08-16T15:19:37.442Z] DEBUG: [runtime-status] [4660] Resolved module firebase-admin {"declared":true,"installed":true,"version":"13.10.0","resolution":"E:\\dev\\risk-takip-sistemi\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2026-08-16T15:19:37.443Z] DEBUG: [runtime-status] [4660] Resolved module firebase-functions {"declared":true,"installed":true,"version":"7.3.2","resolution":"E:\\dev\\risk-takip-sistemi\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"}
+[debug] [2026-08-16T15:19:37.443Z] DEBUG: [runtime-status] [4660] Outgoing network have been stubbed. [{"name":"http","status":"mocked"},{"name":"http","status":"mocked"},{"name":"https","status":"mocked"},{"name":"https","status":"mocked"},{"name":"net","status":"mocked"}]
+[debug] [2026-08-16T15:19:37.443Z] DEBUG: [runtime-status] [4660] Resolved module firebase-functions {"declared":true,"installed":true,"version":"7.3.2","resolution":"E:\\dev\\risk-takip-sistemi\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"}
+[debug] [2026-08-16T15:19:37.443Z] DEBUG: [runtime-status] [4660] Detected firebase-functions v7+, skipping legacy stubs.
+[debug] [2026-08-16T15:19:37.444Z] DEBUG: [runtime-status] [4660] Resolved module firebase-admin {"declared":true,"installed":true,"version":"13.10.0","resolution":"E:\\dev\\risk-takip-sistemi\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2026-08-16T15:19:37.516Z] DEBUG: [runtime-status] [4660] Resolved module firebase-functions {"declared":true,"installed":true,"version":"7.3.2","resolution":"E:\\dev\\risk-takip-sistemi\\functions\\node_modules\\firebase-functions\\lib\\v2\\index.js"}
+[debug] [2026-08-16T15:19:37.658Z] DEBUG: [runtime-status] [4660] firebase-admin has been stubbed. {"adminResolution":{"declared":true,"installed":true,"version":"13.10.0","resolution":"E:\\dev\\risk-takip-sistemi\\functions\\node_modules\\firebase-admin\\lib\\index.js"}}
+[debug] [2026-08-16T15:19:37.666Z] DEBUG: [runtime-status] [4660] Functions runtime initialized. {"cwd":"E:\\dev\\risk-takip-sistemi\\functions","node_version":"24.16.0"}
+[debug] [2026-08-16T15:19:37.666Z] DEBUG: [runtime-status] [4660] Listening to port: \\?\pipe\fire_emu_f7c2dcf06675e077
+[debug] [2026-08-16T15:19:37.750Z] DEBUG: [worker-us-central1-onRiskWrite-de161900-ed1f-4279-b031-031099718854]: IDLE
+[info] >  SyntaxError: Unterminated string in JSON at position 535 (line 1 column 536) {"user":"SyntaxError: Unterminated string in JSON at position 535 (line 1 column 536)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-onRiskWrite"},"extension":{},"message":"\u001b[90m> \u001b[39m SyntaxError: Unterminated string in JSON at position 535 (line 1 column 536)"}}
+[info] >      at JSON.parse (<anonymous>) {"user":"    at JSON.parse (<anonymous>)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-onRiskWrite"},"extension":{},"message":"\u001b[90m> \u001b[39m     at JSON.parse (<anonymous>)"}}
+[info] >      at parse (C:\Users\Kaosc\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\body-parser\lib\types\json.js:96:19) {"user":"    at parse (C:\\Users\\Kaosc\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\node_modules\\body-parser\\lib\\types\\json.js:96:19)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-onRiskWrite"},"extension":{},"message":"\u001b[90m> \u001b[39m     at parse (C:\\Users\\Kaosc\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\node_modules\\body-parser\\lib\\types\\json.js:96:19)"}}
+[info] >      at C:\Users\Kaosc\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\body-parser\lib\read.js:128:18 {"user":"    at C:\\Users\\Kaosc\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\node_modules\\body-parser\\lib\\read.js:128:18","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-onRiskWrite"},"extension":{},"message":"\u001b[90m> \u001b[39m     at C:\\Users\\Kaosc\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\node_modules\\body-parser\\lib\\read.js:128:18"}}
+[info] >      at AsyncResource.runInAsyncScope (node:async_hooks:227:14) {"user":"    at AsyncResource.runInAsyncScope (node:async_hooks:227:14)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-onRiskWrite"},"extension":{},"message":"\u001b[90m> \u001b[39m     at AsyncResource.runInAsyncScope (node:async_hooks:227:14)"}}
+[info] >      at invokeCallback (C:\Users\Kaosc\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\body-parser\node_modules\raw-body\index.js:238:16) {"user":"    at invokeCallback (C:\\Users\\Kaosc\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:238:16)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-onRiskWrite"},"extension":{},"message":"\u001b[90m> \u001b[39m     at invokeCallback (C:\\Users\\Kaosc\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:238:16)"}}
+[info] >      at done (C:\Users\Kaosc\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\body-parser\node_modules\raw-body\index.js:227:7) {"user":"    at done (C:\\Users\\Kaosc\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:227:7)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-onRiskWrite"},"extension":{},"message":"\u001b[90m> \u001b[39m     at done (C:\\Users\\Kaosc\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:227:7)"}}
+[info] >      at IncomingMessage.onEnd (C:\Users\Kaosc\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\body-parser\node_modules\raw-body\index.js:287:7) {"user":"    at IncomingMessage.onEnd (C:\\Users\\Kaosc\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:287:7)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-onRiskWrite"},"extension":{},"message":"\u001b[90m> \u001b[39m     at IncomingMessage.onEnd (C:\\Users\\Kaosc\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:287:7)"}}
+[info] >      at IncomingMessage.emit (node:events:509:28) {"user":"    at IncomingMessage.emit (node:events:509:28)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-onRiskWrite"},"extension":{},"message":"\u001b[90m> \u001b[39m     at IncomingMessage.emit (node:events:509:28)"}}
+[info] >      at endReadableNT (node:internal/streams/readable:1735:12) {"user":"    at endReadableNT (node:internal/streams/readable:1735:12)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-onRiskWrite"},"extension":{},"message":"\u001b[90m> \u001b[39m     at endReadableNT (node:internal/streams/readable:1735:12)"}}
+[info] >      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {"user":"    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-onRiskWrite"},"extension":{},"message":"\u001b[90m> \u001b[39m     at process.processTicksAndRejections (node:internal/process/task_queues:90:21)"}}
