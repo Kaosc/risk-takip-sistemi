@@ -16,10 +16,11 @@ import { safeTimestampToDateString } from "../utils/date"
 import { AllIconNames } from "../types/icon"
 import { Theme } from "../utils/theme"
 import { getStaffs } from "../lib/firebase/firestore/users"
-import { assignRiskToStaff, getRiskById, getRisksByUserId, updateRisk, updateStatus } from "../lib/firebase/firestore/risks"
+import { assignRiskToStaff, getRiskById, updateRisk, updateStatus } from "../lib/firebase/firestore/risks"
 import { uploadImages } from "../lib/firebase/storage"
 import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 import { serverTimestamp } from "@react-native-firebase/firestore"
+import { useTranslation } from "react-i18next"
 
 const fallbackRisk: Risk = {
 	id: "",
@@ -132,12 +133,14 @@ export default function RiskDetailsScreen({
 	}
 }) {
 	const { role } = useSelector((state: RootState) => state.auth)
+	const { t } = useTranslation()
 
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
+	const theme = Theme[darkMode ? "dark" : "light"]
 	const styles = createStyles(darkMode)
 
 	const [risk, setRisk] = useState<Risk>(route?.params?.risk ?? fallbackRisk)
-	const [assignedStaff, setAssignedStaff] = useState("")
+	const [assignedStaff, setAssignedStaff] = useState<{ uid: string; name: string } | null>(null)
 	const [taskDescription, setTaskDescription] = useState("")
 	const [dueDate, setDueDate] = useState<Date | null>(null)
 	const [showDatePicker, setShowDatePicker] = useState(false)
@@ -179,7 +182,10 @@ export default function RiskDetailsScreen({
 						text: staff.name,
 						icon: "account-check-outline" as AllIconNames,
 						onPress: () => {
-							setAssignedStaff(staff.name)
+							setAssignedStaff({
+								uid: staff.uid,
+								name: staff.name,
+							})
 							sheetRef.current?.close()
 						},
 					})),
@@ -207,30 +213,29 @@ export default function RiskDetailsScreen({
 		}
 
 		setIsAssigning(true)
+
 		try {
-			// 1) Önce riski personele ata (görev açıklaması + bitiş tarihi ile)
-			const assignResult = await assignRiskToStaff(risk.id, taskDescription.trim(), dueDate, assignedStaff)
+			const assignResult = await assignRiskToStaff(risk.id, taskDescription.trim(), dueDate, assignedStaff?.uid)
+			const nextStatus = "inprogress"
 
 			if (!assignResult.success) {
 				Alert.alert("Hata", "Görev atanamadı. Lütfen tekrar deneyin.")
 				return
 			}
 
-			// 2) Atama başarılıysa riskin durumunu "pending" yap
-			const statusResult = await updateStatus(risk.id, "inprogress")
+			const statusResult = await updateStatus(risk.id, nextStatus)
 
 			if (!statusResult.success) {
 				Alert.alert("Hata", "Görev atandı fakat durum güncellenemedi. Durumu manuel kontrol edin.")
 				return
 			}
 
-			// 3) Yerel state'i de güncelle
 			setRisk((prev) => ({
 				...prev,
-				assignedTo: assignedStaff,
+				assignedToId: assignedStaff?.uid,
 				taskDescription: taskDescription.trim(),
 				dueDate: (dueDate ?? undefined) as FirebaseTimestamp | undefined,
-				status: "pending",
+				status: nextStatus,
 			}))
 
 			Alert.alert("Başarılı", "Görev atandı ve risk takibe alındı.")
@@ -351,7 +356,7 @@ export default function RiskDetailsScreen({
 
 						<SelectField
 							label="Personel"
-							value={assignedStaff}
+							value={assignedStaff?.name || ""}
 							placeholder="Personel seçin"
 							onPress={() => sheetRef.current?.expand()}
 						/>
@@ -397,10 +402,13 @@ export default function RiskDetailsScreen({
 						)}
 
 						<ThemedButton
-							text="Assign Task"
+							text="Görevi Ata"
 							icon="account-check-outline"
 							onPress={handleAssign}
 							disabled={isAssigning}
+							style={{ marginVertical: 12, backgroundColor: theme.green.bg, borderColor: theme.green.fg, borderWidth: 1 }}
+							iconColor={theme.green.fg}
+							textStyle={{ color: theme.green.fg }}
 						/>
 					</View>
 				)
@@ -411,12 +419,11 @@ export default function RiskDetailsScreen({
 				return (
 					<View style={styles.card}>
 						<ThemedText style={styles.sectionTitle}>Görev Devam Ediyor</ThemedText>
-						<ThemedText style={styles.sectionHint}>Bu bildirimin görevi devam ediyor.</ThemedText>
+						<ThemedText style={styles.sectionHint}>Bu görev personel'e atandı ve çalışma sürecinde.</ThemedText>
 					</View>
 				)
 			}
 
-			// TODO: Add rejection button that will clear the assigned note and afterImages and re assign the task to the staff. This will be used when the admin rejects the task and wants to re assign it to the staff.
 			if (risk.status === "pending") {
 				return (
 					<View style={styles.card}>
@@ -427,9 +434,12 @@ export default function RiskDetailsScreen({
 						<ThemedText style={styles.description}>{risk.completionNotes || "-"}</ThemedText>
 
 						<ThemedButton
-							text="Approve & Close"
+							text="Onayla ve Kapat"
 							icon="check"
 							onPress={handleClose}
+							style={{ marginVertical: 12, backgroundColor: theme.green.bg, borderColor: theme.green.fg, borderWidth: 1 }}
+							iconColor={theme.green.fg}
+							textStyle={{ color: theme.green.fg }}
 						/>
 					</View>
 				)
@@ -491,6 +501,9 @@ export default function RiskDetailsScreen({
 							text="Complete Task"
 							icon="check"
 							onPress={handleCompleteTask}
+							style={{ marginVertical: 12, backgroundColor: theme.green.bg, borderColor: theme.green.fg, borderWidth: 1 }}
+							iconColor={theme.green.fg}
+							textStyle={{ color: theme.green.fg }}
 						/>
 					</View>
 				)
@@ -508,6 +521,21 @@ export default function RiskDetailsScreen({
 	}
 
 	//////////////////////////// RENDER ////////////////////////////
+
+	if (!risk.id) {
+		return (
+			<View style={styles.container}>
+				<CustomHeader title="Risk Detayı" />
+				<View style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 12 }}>
+					<ThemedIcon
+						name="alert-circle-outline"
+						size={48}
+					/>
+					<ThemedText>Risk bulunamadı.</ThemedText>
+				</View>
+			</View>
+		)
+	}
 
 	return (
 		<View style={styles.container}>
@@ -534,28 +562,28 @@ export default function RiskDetailsScreen({
 							name="clipboard-text-outline"
 							size={24}
 						/>
-						<ThemedText style={styles.title}>{risk.type}</ThemedText>
+						<ThemedText style={styles.title}>{t(risk.type)}</ThemedText>
 					</View>
 
 					<DetailRow
 						icon="tag-outline"
 						label="Kategori"
-						value={risk.category}
+						value={t(risk.category)}
 					/>
 					<DetailRow
 						icon="map-marker-outline"
 						label="Konum"
-						value={risk.location}
+						value={t(risk.location)}
 					/>
 					<DetailRow
 						icon="shield-alert-outline"
 						label="Önem"
-						value={risk.severity}
+						value={t(risk.severity)}
 					/>
 					<DetailRow
 						icon="progress-clock"
 						label="Durum"
-						value={risk.status}
+						value={t(risk.status)}
 					/>
 					<DetailRow
 						icon="calendar-outline"
@@ -563,7 +591,14 @@ export default function RiskDetailsScreen({
 						value={safeTimestampToDateString(risk.createdAt)}
 					/>
 
-					<ThemedText style={styles.fieldLabel}>Açıklama</ThemedText>
+					<View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: 6, marginBottom: 5 }}>
+						<ThemedIcon
+							name="information-outline"
+							size={20}
+							style={{ marginTop: 8 }}
+						/>
+						<ThemedText style={styles.fieldLabel}>Açıklama</ThemedText>
+					</View>
 					<ThemedText style={styles.description}>{risk.description || "-"}</ThemedText>
 				</View>
 
@@ -650,9 +685,10 @@ const createStyles = (darkMode: boolean) => {
 			gap: 6,
 		},
 		fieldLabel: {
-			fontSize: 13,
-			fontWeight: "600",
+			fontSize: 15,
+			fontWeight: "900",
 			opacity: 0.8,
+			marginTop: 8,
 		},
 		selectField: {
 			flexDirection: "row",

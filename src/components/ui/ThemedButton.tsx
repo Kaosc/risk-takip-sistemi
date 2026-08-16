@@ -10,6 +10,7 @@ interface ThemedButtonProps extends TouchableOpacityProps {
 	text?: string
 	icon?: AllIconNames
 	iconSize?: number
+	iconColor?: string
 	textStyle?: StyleProp<TextStyle>
 }
 
@@ -28,10 +29,10 @@ export default function ThemedButton(props: ThemedButtonProps) {
 				<ThemedIcon
 					name={props.icon}
 					size={props.iconSize || 24}
-					color={darkMode ? "#000" : "#fff"}
+					color={props.iconColor ? props.iconColor : darkMode ? "#000" : "#fff"}
 				/>
 			)}
-			{props.children || <ThemedText style={styles.buttonText}>{props.text}</ThemedText>}
+			{props.children || <ThemedText style={[styles.buttonText, props.textStyle]}>{props.text}</ThemedText>}
 		</TouchableOpacity>
 	)
 }

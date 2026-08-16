@@ -1,9 +1,3 @@
-- Notification screen + notification badge to home screen top right
-- show read un read notification count on home screen top right and notifications card
-- add a different card ui for unread notifications and read notifications
-- add "read all" bıtton to notificationCard
-- homescreen notificatin badge ui changes
-- send risk category and severity and maybe some other content along with notification payload to show it on notification item card
 - send notification to user who created the risk on every status changes
 - test notifications for STAFF
 - add fullscreen image modal for risk images when its clicked

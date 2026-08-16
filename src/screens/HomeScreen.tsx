@@ -99,17 +99,31 @@ export default function HomeScreen() {
 						</TouchableOpacity>
 					</View>
 
-					<NotificationsCard />
-					<RiskStatusCounts />
+					<View
+						style={{
+							paddingHorizontal: 13,
+							gap: 16,
+						}}
+					>
+						<NotificationsCard />
+						<RiskStatusCounts />
+					</View>
 				</View>
 
-				{/* ===== Actions ===== */}
-				<ThemedButton
-					text={"Yeni Risk Ekle"}
-					icon={"plus-circle-outline"}
-					iconSize={22}
-					onPress={() => navigation.navigate("RiskFormScreen")}
-				/>
+				<View
+					style={{
+						paddingHorizontal: 13,
+						paddingBottom: 20,
+						gap: 12,
+					}}
+				>
+					<ThemedButton
+						text={"Yeni Risk Ekle"}
+						icon={"plus-circle-outline"}
+						iconSize={22}
+						onPress={() => navigation.navigate("RiskFormScreen")}
+					/>
+				</View>
 			</ScrollView>
 		</View>
 	)
@@ -124,7 +138,6 @@ const createStyles = (darkMode: boolean) => {
 			backgroundColor: darkMode ? "#000" : "#fff",
 		},
 		content: {
-			padding: 20,
 			flexGrow: 1,
 			justifyContent: "space-between",
 			gap: 18,
@@ -139,11 +152,11 @@ const createStyles = (darkMode: boolean) => {
 			flexDirection: "row",
 			alignItems: "center",
 			gap: 14,
-			borderRadius: 20,
 			backgroundColor: theme.cardBackground,
-			padding: 18,
-			borderWidth: 1,
-			borderColor: theme.border,
+			borderBottomWidth: 1,
+			borderBottomColor: theme.border,
+			paddingHorizontal: 16,
+			paddingVertical: 20,
 		},
 		avatar: {
 			width: 64,

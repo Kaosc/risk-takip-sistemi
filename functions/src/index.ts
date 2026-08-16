@@ -114,11 +114,11 @@ export const onRiskWrite = onDocumentWritten(`${COLLECTIONS.RISKS}/{riskId}`, as
 
 	if (afterStatus === "inprogress") {
 		// 2) Admin assigned task to staff.
-		const assignedToken = await getUserTokenByUid(afterData.assignedTo)
+		const assignedToken = await getUserTokenByUid(afterData.assignedToId)
 		if (!assignedToken) {
 			logger.info("Assigned user has no valid FCM token; notification skipped.", {
 				riskId,
-				assignedTo: afterData.assignedTo,
+				assignedToId: afterData.assignedToId,
 			})
 			return
 		}

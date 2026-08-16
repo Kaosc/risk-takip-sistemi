@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, View } from "react-native"
+import { Alert, FlatList, StyleSheet, TouchableOpacity, View } from "react-native"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { useMMKVObject } from "react-native-mmkv"
@@ -6,9 +6,9 @@ import { useMMKVObject } from "react-native-mmkv"
 import ThemedText from "../components/ui/ThemedText"
 import ThemedIcon from "../components/ui/ThemedIcon"
 import NotificationItem from "../components/NotificationItem"
+import CustomHeader from "../components/CustomHeader"
 
 import { Theme } from "../utils/theme"
-import CustomHeader from "../components/CustomHeader"
 
 export default function NotificationsScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
@@ -35,12 +35,55 @@ export default function NotificationsScreen() {
 		/>
 	)
 
+	const emptyNotifications = () => {
+		Alert.alert(
+			"Bildirimleri Temizle",
+			"Tüm bildirimleri silmek istediğinizden emin misiniz?",
+			[
+				{
+					text: "İptal",
+					style: "cancel",
+				},
+				{
+					text: "Sil",
+					style: "destructive",
+					onPress: () => setNotifications([]),
+				},
+			],
+			{ cancelable: true },
+		)
+	}
+
+	const RightComponent = () => (
+		<View
+			style={{
+				flex: 1,
+				flexDirection: "row",
+				alignItems: "center",
+				gap: 8,
+				width: "100%",
+				justifyContent: "flex-end",
+			}}
+		>
+			<ThemedText style={styles.totalCount}>{sortedNotifications.length}</ThemedText>
+			<TouchableOpacity
+				onPress={emptyNotifications}
+				style={styles.backButton}
+			>
+				<ThemedIcon
+					name="trash-can-outline"
+					size={20}
+				/>
+			</TouchableOpacity>
+		</View>
+	)
+
 	return (
 		<View style={styles.container}>
 			<CustomHeader
 				title="Bildirimler"
 				onBackPress={() => navigation.goBack()}
-				rightComponent={<ThemedText style={styles.totalCount}>{sortedNotifications.length}</ThemedText>}
+				rightComponent={<RightComponent />}
 			/>
 
 			{sortedNotifications.length > 0 ? (

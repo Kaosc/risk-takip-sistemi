@@ -42,7 +42,7 @@ export default function RisksScreen({
 
 	useFocusEffect(
 		useCallback(() => {
-			navigation.setParams({ status: undefined })
+			return () => navigation.setParams({ status: undefined })
 		}, []),
 	)
 
@@ -69,6 +69,10 @@ export default function RisksScreen({
 		}
 
 		setLoading(false)
+	}
+
+	const onRefresh = async () => {
+		await fetchRisks()
 	}
 
 	const theme = Theme[darkMode ? "dark" : "light"]
@@ -221,6 +225,8 @@ export default function RisksScreen({
 				style={styles.list}
 				contentContainerStyle={styles.listContent}
 				ListHeaderComponent={<TabButtons />}
+				refreshing={loading}
+				onRefresh={onRefresh}
 				showsVerticalScrollIndicator={false}
 				ListEmptyComponent={
 					<View style={styles.emptyContainer}>

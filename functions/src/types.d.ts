@@ -3,7 +3,7 @@ type RiskSeverity = "low" | "medium" | "high" | "critical"
 
 interface RiskDocument {
 	status?: RiskStatus | string
-	assignedTo?: string
+	assignedToId?: string
 	createdBy?: string
 	severity: RiskSeverity
 }

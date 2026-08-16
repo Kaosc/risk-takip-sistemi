@@ -79,7 +79,7 @@ export const deleteRisk = async (id: string) => {
 export const assignRiskToStaff = async (riskId: string, taskDescription: string, dueDate: Date | null, staffId: string) => {
 	try {
 		await updateDoc(doc(db, COLLECTIONS.RISKS, riskId), {
-			assignedTo: staffId,
+			assignedToId: staffId,
 			taskDescription: taskDescription,
 			dueDate: dueDate,
 		})
@@ -144,7 +144,7 @@ export const getRisksByUserId = async (userId: string): Promise<Risk[]> => {
 export const getRisksAssignedToStaff = async (staffId: string): Promise<Risk[]> => {
 	try {
 		const risksRef = collection(db, COLLECTIONS.RISKS)
-		const q = query(risksRef, where("assignedTo", "==", staffId), orderBy("createdAt", "desc"))
+		const q = query(risksRef, where("assignedToId", "==", staffId), orderBy("createdAt", "desc"))
 		const snapshot = await getDocs(q)
 
 		return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Risk)
@@ -160,12 +160,12 @@ export const getRiskById = async (riskId: string): Promise<Risk | null> => {
 		const riskData = riskDoc.data() as Risk | undefined
 
 		if (!riskData) {
-			console.error("Risk bulunamadı:", riskId)
+			console.debug("Risk bulunamadı:", riskId)
 			return null
 		}
 		return { ...riskData }
 	} catch (error: any) {
-		console.error("Risk alınırken hata oluştu:", error)
+		console.debug("Risk alınırken hata oluştu:", error)
 		return null
 	}
 }

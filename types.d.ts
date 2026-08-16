@@ -99,7 +99,7 @@ interface Risk {
 	}
 
 	// --- 2. ASSESSMENT & ASSIGNMENT STAGE (İSG Uzmanı Doldurur) ---
-	assignedTo?: string // Görev atanan personelin UID'si
+	assignedToId?: string // Görev atanan personelin UID'si
 	taskDescription?: string // Yapılması istenen düzeltici faaliyet
 	dueDate?: FirebaseTimestamp // Termin tarihi
 
