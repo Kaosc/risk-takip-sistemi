@@ -5,13 +5,13 @@ const formatLocalDate = (date: Date): string => {
 	const year = date.getFullYear()
 	const month = String(date.getMonth() + 1).padStart(2, "0")
 	const day = String(date.getDate()).padStart(2, "0")
-	return `${year}-${month}-${day}`
+	return `${day}/${month}/${year}`
 }
 
 /**
  * Formats a Date to "YYYY-MM-DD HH:MM:SS" in the device's local timezone.
  */
-const formatLocalDateTime = (date: Date): string => {
+export const formatLocalDateTime = (date: Date): string => {
 	const year = date.getFullYear()
 	const month = String(date.getMonth() + 1).padStart(2, "0")
 	const day = String(date.getDate()).padStart(2, "0")

@@ -31,7 +31,7 @@ export default function RisksScreen({
 
 	const [risks, setRisks] = useState<Risk[]>([])
 	const [loading, setLoading] = useState(true)
-	const [statusFilter, setStatusFilter] = useState<RiskStatus | null>(route.params?.status || null)
+	const [statusFilter, setStatusFilter] = useState<RiskStatus | null>()
 
 	const filteredRisks = useMemo(() => {
 		if (statusFilter) {
@@ -42,8 +42,13 @@ export default function RisksScreen({
 
 	useFocusEffect(
 		useCallback(() => {
+			console.log(route.params?.status)
+			if (route.params?.status) {
+				setStatusFilter(route.params.status)
+			}
+
 			return () => navigation.setParams({ status: undefined })
-		}, []),
+		}, [route.params?.status, navigation]),
 	)
 
 	useEffect(() => {
@@ -158,7 +163,12 @@ export default function RisksScreen({
 					<View
 						style={[
 							styles.badge,
-							{ backgroundColor: severityBadgeColor[item.severity].bg, borderColor: severityBadgeColor[item.severity].txt },
+							{
+								flex: 0,
+								alignItems: "flex-start",
+								backgroundColor: severityBadgeColor[item.severity].bg,
+								borderColor: severityBadgeColor[item.severity].txt,
+							},
 						]}
 					>
 						<ThemedText style={[styles.badgeText, { color: severityBadgeColor[item.severity].txt }]}>
@@ -168,7 +178,12 @@ export default function RisksScreen({
 					<View
 						style={[
 							styles.badge,
-							{ backgroundColor: statusBadgeColor[item.status].bg, borderColor: statusBadgeColor[item.status].txt },
+							{
+								flex: 0,
+								alignItems: "flex-start",
+								backgroundColor: statusBadgeColor[item.status].bg,
+								borderColor: statusBadgeColor[item.status].txt,
+							},
 						]}
 					>
 						<ThemedText style={[styles.badgeText, { color: statusBadgeColor[item.status].txt }]}>
@@ -180,40 +195,54 @@ export default function RisksScreen({
 		</TouchableOpacity>
 	)
 
-	const TabButtons = () => (
-		<ScrollView
-			horizontal
-			style={styles.tabRow}
-			contentContainerStyle={{ flexGrow: 1, justifyContent: "space-around", gap: 10 }}
-			showsHorizontalScrollIndicator={false}
-		>
-			{(["new", "inprogress", "pending", "completed"] as RiskStatus[]).map((status) => (
-				<TouchableOpacity
-					key={status}
-					style={[
-						styles.badge,
-						{
-							minHeight: 34,
-							paddingHorizontal: 14,
-							paddingVertical: 6,
-							backgroundColor: statusBadgeColor[status].bg,
-							borderColor: statusBadgeColor[status].txt,
-							opacity: statusFilter === status ? 1 : 0.55,
-						},
-					]}
-					onPress={() => {
-						if (statusFilter === status) {
-							setStatusFilter(null)
-						} else {
-							setStatusFilter(status)
-						}
-					}}
-				>
-					<ThemedText style={[styles.badgeLabel, { color: statusBadgeColor[status].txt, fontSize: 14 }]}>{t(status)}</ThemedText>
-				</TouchableOpacity>
-			))}
-		</ScrollView>
-	)
+	const TabButtons = () => {
+		const tabs = (): RiskStatus[] => {
+			if (role === "ADMIN") {
+				return ["new", "inprogress", "pending", "completed"]
+			} else if (role === "STAFF") {
+				return ["inprogress", "pending", "completed"]
+			} else {
+				return ["new", "inprogress", "pending", "completed"]
+			}
+		}
+
+		return (
+			<ScrollView
+				horizontal
+				style={styles.tabRow}
+				contentContainerStyle={{ flexGrow: 1, justifyContent: "space-around", gap: 10 }}
+				showsHorizontalScrollIndicator={false}
+			>
+				{tabs().map((status) => (
+					<TouchableOpacity
+						key={status}
+						style={[
+							styles.badge,
+							{
+								minHeight: 34,
+								paddingHorizontal: 14,
+								paddingVertical: 6,
+								backgroundColor: statusBadgeColor[status].bg,
+								borderColor: statusBadgeColor[status].txt,
+								opacity: statusFilter === status ? 1 : 0.35,
+							},
+						]}
+						onPress={() => {
+							if (statusFilter === status) {
+								setStatusFilter(null)
+							} else {
+								setStatusFilter(status)
+							}
+						}}
+					>
+						<ThemedText style={[styles.badgeLabel, { color: statusBadgeColor[status].txt, fontSize: 14 }]}>
+							{t(status)}
+						</ThemedText>
+					</TouchableOpacity>
+				))}
+			</ScrollView>
+		)
+	}
 
 	return (
 		<View style={styles.container}>
@@ -235,7 +264,7 @@ export default function RisksScreen({
 							size={50}
 							style={{ opacity: 0.6 }}
 						/>
-						<ThemedText style={styles.emptyText}>Kayıtlı risk raporunuz yok</ThemedText>
+						<ThemedText style={styles.emptyText}>Kayıt bulunamadı.</ThemedText>
 					</View>
 				}
 			/>
@@ -320,6 +349,8 @@ const createStyles = (darkMode: boolean) => {
 			borderWidth: 1,
 			borderColor: theme.border,
 			backgroundColor: darkMode ? "#1f1f22" : "#ffffff",
+			flex: 1,
+			alignItems: "center",
 		},
 		badgeLabel: {
 			fontSize: 12,

@@ -87,16 +87,81 @@ export const RiskStatusCounts = () => {
 		</TouchableOpacity>
 	)
 
-	return (
+	const Container = ({ children }: { children: React.ReactNode }) => (
 		<View style={styles.container}>
 			<View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
 				<ThemedIcon
 					name="information-variant-circle-outline"
 					size={18}
 				/>
-				<ThemedText style={{ fontSize: 16, fontWeight: "bold" }}>{role === "ADMIN" ? "Risk Durumları" : "Raporlarım"}</ThemedText>
+				<ThemedText style={{ fontSize: 16, fontWeight: "bold" }}>{t("Raporlarım")}</ThemedText>
 			</View>
+			{children}
+		</View>
+	)
 
+	// first show how many task assigned to this staff and how many is wating for to work (status === "inprogress") with different full width card
+	// and blow 3 boxes which will show count of inprogress, pending and completed tasks for this staff
+	if (role === "STAFF") {
+		return (
+			<Container>
+				<TouchableOpacity
+					activeOpacity={0.7}
+					onPress={() => handleNavigateToStatus("inprogress")}
+					style={[
+						styles.row,
+						{
+							backgroundColor: theme.blue.bg,
+							borderColor: theme.blue.fg + "88",
+							borderWidth: 1,
+							padding: 10,
+							borderRadius: 12,
+							flexDirection: "row",
+							justifyContent: "space-between",
+							alignItems: "center",
+						},
+					]}
+				>
+					<View style={{ gap: 10, flex: 1 }}>
+						<View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+							<ThemedIcon
+								name="clipboard-text-outline"
+								size={22}
+							/>
+							<ThemedText style={{ fontSize: 14, fontWeight: "bold" }}>{"Atanan Görevler"}</ThemedText>
+						</View>
+
+						<View style={{ flex: 1, justifyContent: "center" }}>
+							{counts?.inprogress ? (
+								<ThemedText style={{ fontSize: 15 }}>İncelenmeyi bekleyen {counts?.inprogress || 0} görev var</ThemedText>
+							) : (
+								<ThemedText style={{ fontSize: 15 }}>Atanamış hiç görev yok</ThemedText>
+							)}
+						</View>
+					</View>
+
+					{counts?.inprogress ? (
+						<ThemedText style={{ fontSize: 25, fontWeight: "bold" }}>{counts?.inprogress || 0}</ThemedText>
+					) : (
+						<ThemedIcon
+							name="check-circle-outline"
+							size={25}
+							color={theme.blue.fg}
+						/>
+					)}
+				</TouchableOpacity>
+
+				<View style={styles.row}>
+					<Box card={cards[2]} />
+					<Box card={cards[3]} />
+				</View>
+			</Container>
+		)
+	}
+
+	// For MEMBER & ADMIN
+	return (
+		<View style={styles.container}>
 			<View style={styles.row}>
 				<Box card={cards[0]} />
 				<Box card={cards[1]} />

@@ -163,7 +163,7 @@ export const getRiskById = async (riskId: string): Promise<Risk | null> => {
 			console.debug("Risk bulunamadı:", riskId)
 			return null
 		}
-		return { ...riskData }
+		return { ...riskData, id: riskDoc.id }
 	} catch (error: any) {
 		console.debug("Risk alınırken hata oluştu:", error)
 		return null
