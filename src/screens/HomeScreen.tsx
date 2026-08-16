@@ -153,7 +153,7 @@ const createStyles = (darkMode: boolean) => {
 			alignItems: "center",
 			gap: 14,
 			backgroundColor: theme.cardBackground,
-			borderBottomWidth: 1,
+			borderBottomWidth: StyleSheet.hairlineWidth,
 			borderBottomColor: theme.border,
 			paddingHorizontal: 16,
 			paddingVertical: 20,

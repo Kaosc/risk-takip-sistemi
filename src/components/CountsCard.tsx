@@ -1,6 +1,7 @@
 import { View, StyleSheet, TouchableOpacity } from "react-native"
 import { useEffect, useState } from "react"
 import { useNavigation, NavigationProp } from "@react-navigation/native"
+import { getMessaging, onMessage } from "@react-native-firebase/messaging"
 
 import { getCountOfRisksByStatus } from "../lib/firebase/firestore/risks"
 import { useTranslation } from "react-i18next"
@@ -22,6 +23,8 @@ interface CountCard {
 	border: string
 }
 
+const messaging = getMessaging()
+
 export const RiskStatusCounts = () => {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const navigation = useNavigation() as NavigationProp<any>
@@ -33,14 +36,22 @@ export const RiskStatusCounts = () => {
 	const [counts, setCounts] = useState<Record<RiskStatus, number> | null>(null)
 	const [loading, setLoading] = useState(true)
 
-	useEffect(() => {
-		const fetchCounts = async () => {
-			const data = await getCountOfRisksByStatus()
-			setCounts(data)
-			setLoading(false)
-		}
+	const fetchCounts = async () => {
+		const data = await getCountOfRisksByStatus()
+		setCounts(data)
+		setLoading(false)
+	}
 
+	useEffect(() => {
 		fetchCounts()
+	}, [])
+
+	useEffect(() => {
+		const unsubscribe = onMessage(messaging, async (m) => {
+			await fetchCounts()
+		})
+
+		return unsubscribe
 	}, [])
 
 	const theme = Theme[darkMode ? "dark" : "light"]
@@ -57,13 +68,6 @@ export const RiskStatusCounts = () => {
 			border: theme.green.fg,
 		},
 	]
-
-	if (loading)
-		return (
-			<View style={styles.container}>
-				<ThemedActivityIndicator size="large" />
-			</View>
-		)
 
 	const handleNavigateToStatus = (status: RiskStatus) => {
 		navigation.navigate("RisksStack", { screen: "RisksScreen", params: { status } })
@@ -100,8 +104,26 @@ export const RiskStatusCounts = () => {
 		</View>
 	)
 
-	// first show how many task assigned to this staff and how many is wating for to work (status === "inprogress") with different full width card
-	// and blow 3 boxes which will show count of inprogress, pending and completed tasks for this staff
+	if (loading) {
+		return (
+			<Container>
+				<View
+					style={[
+						styles.container,
+						{
+							minHeight: 190,
+							alignItems: "center",
+							justifyContent: "center",
+							borderWidth: 0,
+						},
+					]}
+				>
+					<ThemedActivityIndicator size="large" />
+				</View>
+			</Container>
+		)
+	}
+
 	if (role === "STAFF" || role === "ADMIN") {
 		return (
 			<Container>
@@ -128,7 +150,9 @@ export const RiskStatusCounts = () => {
 								name="clipboard-text-outline"
 								size={22}
 							/>
-							<ThemedText style={{ fontSize: 14, fontWeight: "bold" }}>{role === "STAFF" ? "Atanan Görevler" : "İncelenmeyi Bekleyen Riskler"}</ThemedText>
+							<ThemedText style={{ fontSize: 14, fontWeight: "bold" }}>
+								{role === "STAFF" ? "Atanan Görevler" : "İncelenmeyi Bekleyen Riskler"}
+							</ThemedText>
 						</View>
 
 						{role === "STAFF" ? (
