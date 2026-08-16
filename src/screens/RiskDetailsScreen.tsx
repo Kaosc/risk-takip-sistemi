@@ -11,6 +11,7 @@ import ThemedButton from "../components/ui/ThemedButton"
 import ThemedIcon from "../components/ui/ThemedIcon"
 import ThemedBottomSheet from "../components/ui/ThemedBottomSheet"
 import CustomHeader from "../components/CustomHeader"
+import FullScreenModal from "../components/FullScreenModal"
 
 import { safeTimestampToDateString } from "../utils/date"
 import { AllIconNames } from "../types/icon"
@@ -85,7 +86,15 @@ function DetailRow({ icon, label, value }: { icon: AllIconNames; label: string; 
 	)
 }
 
-function ThumbnailsRow({ images, onRemove }: { images: string[]; onRemove?: (index: number) => void }) {
+function ThumbnailsRow({
+	images,
+	onRemove,
+	onPress,
+}: {
+	images: string[]
+	onRemove?: (index: number) => void
+	onPress?: (uri: string) => void
+}) {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const styles = createStyles(darkMode)
 
@@ -98,9 +107,12 @@ function ThumbnailsRow({ images, onRemove }: { images: string[]; onRemove?: (ind
 			style={styles.imageList}
 		>
 			{images.map((uri, index) => (
-				<View
+				<TouchableOpacity
 					key={`${index}-${uri}`}
 					style={styles.thumbWrap}
+					activeOpacity={0.7}
+					disabled={!onPress}
+					onPress={onPress ? () => onPress(uri) : undefined}
 				>
 					<Image
 						source={{ uri }}
@@ -119,7 +131,7 @@ function ThumbnailsRow({ images, onRemove }: { images: string[]; onRemove?: (ind
 							/>
 						</TouchableOpacity>
 					)}
-				</View>
+				</TouchableOpacity>
 			))}
 		</ScrollView>
 	)
@@ -250,6 +262,7 @@ export default function RiskDetailsScreen({
 	const [isPicking, setIsPicking] = useState(false)
 	const [sheetItems, setSheetItems] = useState<{ text: string; icon: AllIconNames; onPress: () => void }[]>([])
 	const [loading, setLoading] = useState(false)
+	const [viewerImage, setViewerImage] = useState<string | null>(null)
 
 	const sheetRef = useRef<BottomSheet | null>(null)
 
@@ -565,6 +578,7 @@ export default function RiskDetailsScreen({
 					<ThumbnailsRow
 						images={afterImages}
 						onRemove={(index) => setAfterImages((prev) => prev.filter((_, i) => i !== index))}
+						onPress={setViewerImage}
 					/>
 
 					<ThemedText style={styles.fieldLabel}>Tamamlanma Notu</ThemedText>
@@ -598,7 +612,10 @@ export default function RiskDetailsScreen({
 					<ThemedText style={styles.sectionTitle}>Çalışma Tamamlandı</ThemedText>
 					<ThemedText style={styles.sectionHint}>Personel görevi tamamladı ve onay bekliyor.</ThemedText>
 					<ThemedText style={styles.fieldLabel}>Personelin Yüklediği Görseller</ThemedText>
-					<ThumbnailsRow images={risk.afterImages || []} />
+					<ThumbnailsRow
+						images={risk.afterImages || []}
+						onPress={setViewerImage}
+					/>
 					<ThemedText style={styles.fieldLabel}>Tamamlanma Notu</ThemedText>
 					<ThemedText style={styles.description}>{risk.completionNotes || "-"}</ThemedText>
 
@@ -622,7 +639,10 @@ export default function RiskDetailsScreen({
 					<ThemedText style={styles.sectionTitle}>Tamamlandı</ThemedText>
 					<ThemedText style={styles.sectionHint}>Bu risk bildirimi tamamlandı ve kapatıldı.</ThemedText>
 					<ThemedText style={styles.fieldLabel}>Çalışma Sonrası Görseller</ThemedText>
-					<ThumbnailsRow images={risk.afterImages || []} />
+					<ThumbnailsRow
+						images={risk.afterImages || []}
+						onPress={setViewerImage}
+					/>
 					<ThemedText style={styles.fieldLabel}>Açıklama / Not</ThemedText>
 					<ThemedText style={styles.description}>{risk.completionNotes || "-"}</ThemedText>
 				</View>
@@ -709,7 +729,10 @@ export default function RiskDetailsScreen({
 					{risk.images.length > 0 && (
 						<View style={styles.section}>
 							<ThemedText style={styles.sectionTitle}>Görseller</ThemedText>
-							<ThumbnailsRow images={risk.images} />
+							<ThumbnailsRow
+								images={risk.images}
+								onPress={setViewerImage}
+							/>
 						</View>
 					)}
 				</View>
@@ -721,6 +744,12 @@ export default function RiskDetailsScreen({
 				ref={sheetRef}
 				snapPoints={["40%"]}
 				items={sheetItems}
+			/>
+
+			<FullScreenModal
+				visible={viewerImage !== null}
+				image={viewerImage}
+				onClose={() => setViewerImage(null)}
 			/>
 		</View>
 	)

@@ -42,7 +42,6 @@ export default function RisksScreen({
 
 	useFocusEffect(
 		useCallback(() => {
-			console.log(route.params?.status)
 			if (route.params?.status) {
 				setStatusFilter(route.params.status)
 			}
