@@ -37,7 +37,7 @@ export default function NotificationsCard() {
 			const newNotification = processNotification(remoteMessage)
 			if (newNotification) {
 				if (Array.isArray(notifications)) {
-					setNotifications((prev) => [newNotification, ...(prev || [])])
+					setNotifications(() => [newNotification, ...notifications])
 				} else {
 					setNotifications([newNotification])
 				}

@@ -1,14 +1,15 @@
 import { RemoteMessage } from "@react-native-firebase/messaging"
 import { getNotifications, storeNotifications } from "../utils/storage"
+import { nanoid } from "@reduxjs/toolkit"
 
 export const processNotification = (remoteMessage: RemoteMessage): NotificationData | null => {
 	let newNotification: NotificationData | null = null
 
 	try {
 		newNotification = {
-			id: remoteMessage.messageId,
+			id: nanoid(),
 			title: remoteMessage.notification?.title || "Yeni Bildirim",
-			body: remoteMessage.notification?.body || "",
+			body: remoteMessage.notification?.body || "---",
 			date: new Date().toISOString(),
 			riskId: remoteMessage.data?.riskId,
 			read: false,
