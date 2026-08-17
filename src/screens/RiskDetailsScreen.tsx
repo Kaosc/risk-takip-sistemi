@@ -640,11 +640,15 @@ export default function RiskDetailsScreen({
 				<View style={[styles.card, { backgroundColor: theme.green.bg, borderColor: theme.green.fg, borderWidth: 1 }]}>
 					<ThemedText style={styles.sectionTitle}>Tamamlandı</ThemedText>
 					<ThemedText style={styles.sectionHint}>Bu risk bildirimi tamamlandı ve kapatıldı.</ThemedText>
-					<ThemedText style={styles.fieldLabel}>Çalışma Sonrası Görseller</ThemedText>
-					<ThumbnailsRow
-						images={risk.afterImages || []}
-						onPress={setViewerImage}
-					/>
+					{Array.isArray(risk.afterImages) && risk.afterImages.length > 0 && (
+						<>
+							<ThemedText style={styles.fieldLabel}>Çalışma Sonrası Görseller</ThemedText>
+							<ThumbnailsRow
+								images={risk.afterImages || []}
+								onPress={setViewerImage}
+							/>
+						</>
+					)}
 					<ThemedText style={styles.fieldLabel}>Açıklama / Not</ThemedText>
 					<ThemedText style={styles.description}>{risk.completionNotes || "-"}</ThemedText>
 				</View>

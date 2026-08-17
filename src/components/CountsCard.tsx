@@ -124,24 +124,18 @@ export const RiskStatusCounts = () => {
 		)
 	}
 
-	if (role === "STAFF" || role === "ADMIN") {
+	if (role === "ADMIN") {
 		return (
 			<Container>
 				<TouchableOpacity
 					activeOpacity={0.7}
-					onPress={() => handleNavigateToStatus(role === "ADMIN" ? "new" : "inprogress")}
+					onPress={() => handleNavigateToStatus("new")}
 					style={[
 						styles.row,
+						styles.rowButton,
 						{
-							backgroundColor: role === "ADMIN" ? theme.primary.bg : theme.blue.bg,
-							borderColor: role === "ADMIN" ? theme.primary.fg : theme.blue.fg,
-							borderWidth: 1,
-							padding: 10,
-							borderRadius: 12,
-							flexDirection: "row",
-							justifyContent: "space-between",
-							alignItems: "center",
-							paddingHorizontal: 14,
+							backgroundColor: theme.primary.bg,
+							borderColor: theme.primary.fg,
 						},
 					]}
 				>
@@ -151,43 +145,121 @@ export const RiskStatusCounts = () => {
 								name="clipboard-text-outline"
 								size={22}
 							/>
-							<ThemedText style={{ fontSize: 14, fontWeight: "bold" }}>
-								{role === "STAFF" ? "Atanan Görevler" : "İncelenmeyi Bekleyen Riskler"}
-							</ThemedText>
+							<ThemedText style={{ fontSize: 14, fontWeight: "bold" }}>İncelenmeyi Bekleyen Riskler</ThemedText>
 						</View>
-
-						{role === "STAFF" ? (
-							<View style={{ flex: 1, justifyContent: "center" }}>
-								{counts?.inprogress ? (
-									<ThemedText style={{ fontSize: 15 }}>İlgilenilmesi gereken {counts?.inprogress || 0} görev var</ThemedText>
-								) : (
-									<ThemedText style={{ fontSize: 15 }}>Atanamış hiç görev yok</ThemedText>
-								)}
-							</View>
-						) : (
-							<View style={{ flex: 1, justifyContent: "center" }}>
-								{counts?.new ? (
-									<ThemedText style={{ fontSize: 15 }}>İncelenmeyi bekleyen {counts?.new || 0} risk var</ThemedText>
-								) : (
-									<ThemedText style={{ fontSize: 15 }}>İncelenmeyi bekleyen hiç risk yok</ThemedText>
-								)}
-							</View>
-						)}
+						<View style={{ flex: 1, justifyContent: "center" }}>
+							{counts?.new ? (
+								<ThemedText style={{ fontSize: 15 }}>İncelenmeyi bekleyen {counts?.new || 0} risk var</ThemedText>
+							) : (
+								<ThemedText style={{ fontSize: 15 }}>İncelenmeyi bekleyen hiç risk yok</ThemedText>
+							)}
+						</View>
 					</View>
 
-					{(role === "STAFF" && counts?.inprogress) || (role === "ADMIN" && counts?.new) ? (
-						<ThemedText style={{ fontSize: 25, fontWeight: "bold" }}>{role === "STAFF" ? counts?.inprogress : counts?.new}</ThemedText>
+					{role === "ADMIN" && counts?.new ? (
+						<ThemedText style={{ fontSize: 25, fontWeight: "bold" }}>{counts?.new}</ThemedText>
 					) : (
 						<ThemedIcon
 							name="check-circle-outline"
 							size={25}
-							color={role === "STAFF" ? theme.blue.fg : theme.primary.fg}
+							color={theme.primary.fg}
+						/>
+					)}
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					activeOpacity={0.7}
+					onPress={() => handleNavigateToStatus("pending")}
+					style={[
+						styles.row,
+						styles.rowButton,
+						{
+							backgroundColor: theme.orange.bg,
+							borderColor: theme.orange.fg,
+						},
+					]}
+				>
+					<View style={{ gap: 10, flex: 1 }}>
+						<View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+							<ThemedIcon
+								name="clipboard-text-outline"
+								size={22}
+							/>
+							<ThemedText style={{ fontSize: 14, fontWeight: "bold" }}>Onay Bekleyen Riskler</ThemedText>
+						</View>
+						<View style={{ flex: 1, justifyContent: "center" }}>
+							{counts?.pending ? (
+								<ThemedText style={{ fontSize: 15 }}>Onay bekleyen {counts?.pending || 0} risk var</ThemedText>
+							) : (
+								<ThemedText style={{ fontSize: 15 }}>Onay bekleyen hiç risk yok</ThemedText>
+							)}
+						</View>
+					</View>
+
+					{role === "ADMIN" && counts?.pending ? (
+						<ThemedText style={{ fontSize: 25, fontWeight: "bold" }}>{counts?.pending}</ThemedText>
+					) : (
+						<ThemedIcon
+							name="check-circle-outline"
+							size={25}
+							color={theme.orange.fg}
 						/>
 					)}
 				</TouchableOpacity>
 
 				<View style={styles.row}>
-					{role === "ADMIN" && <Box card={cards[1]} />}
+					<Box card={cards[1]} />
+					<Box card={cards[3]} />
+				</View>
+			</Container>
+		)
+	}
+
+	if (role === "STAFF") {
+		return (
+			<Container>
+				<TouchableOpacity
+					activeOpacity={0.7}
+					onPress={() => handleNavigateToStatus("inprogress")}
+					style={[
+						styles.row,
+						styles.rowButton,
+						{
+							backgroundColor: theme.blue.bg,
+							borderColor: theme.blue.fg,
+						},
+					]}
+				>
+					<View style={{ gap: 10, flex: 1 }}>
+						<View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+							<ThemedIcon
+								name="clipboard-text-outline"
+								size={22}
+							/>
+							<ThemedText style={{ fontSize: 14, fontWeight: "bold" }}>Atanan Görevler</ThemedText>
+						</View>
+
+						<View style={{ flex: 1, justifyContent: "center" }}>
+							{counts?.inprogress ? (
+								<ThemedText style={{ fontSize: 15 }}>İlgilenilmesi gereken {counts?.inprogress || 0} görev var</ThemedText>
+							) : (
+								<ThemedText style={{ fontSize: 15 }}>Atanamış hiç görev yok</ThemedText>
+							)}
+						</View>
+					</View>
+
+					{counts?.inprogress ? (
+						<ThemedText style={{ fontSize: 25, fontWeight: "bold" }}>{counts?.inprogress}</ThemedText>
+					) : (
+						<ThemedIcon
+							name="check-circle-outline"
+							size={25}
+							color={theme.blue.fg}
+						/>
+					)}
+				</TouchableOpacity>
+
+				<View style={styles.row}>
 					<Box card={cards[2]} />
 					<Box card={cards[3]} />
 				</View>
@@ -244,6 +316,15 @@ const createStyles = (darkMode: boolean) => {
 		count: {
 			fontSize: 23,
 			fontWeight: "bold",
+		},
+		rowButton: {
+			borderWidth: 1,
+			padding: 10,
+			borderRadius: 12,
+			flexDirection: "row",
+			justifyContent: "space-between",
+			alignItems: "center",
+			paddingHorizontal: 14,
 		},
 	})
 }
