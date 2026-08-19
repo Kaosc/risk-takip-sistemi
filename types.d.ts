@@ -136,10 +136,10 @@ type NotificationPayload = {
 }
 
 type NotificationData = {
-	id: string | undefined
+	id: string
 	title: string
 	body: string
 	date: string
-	riskId: string | object | undefined
+	riskId: string
 	read: boolean
 }

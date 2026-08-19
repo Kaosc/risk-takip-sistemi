@@ -152,7 +152,7 @@ const riskProgressSteps: {
 	},
 	{
 		status: "inprogress",
-		title: "Süreçte",
+		title: "Çalışılıyor",
 		desc: "Görev personele atandı, çözüm çalışması devam ediyor.",
 		icon: "progress-clock",
 	},

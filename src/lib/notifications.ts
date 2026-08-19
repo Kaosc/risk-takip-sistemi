@@ -11,7 +11,7 @@ export const processNotification = (remoteMessage: RemoteMessage): NotificationD
 			title: remoteMessage.notification?.title || "Yeni Bildirim",
 			body: remoteMessage.notification?.body || "---",
 			date: new Date().toISOString(),
-			riskId: remoteMessage.data?.riskId,
+			riskId: (remoteMessage.data?.riskId as string) || "",
 			read: false,
 		}
 	} catch (e) {

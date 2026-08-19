@@ -22,13 +22,17 @@ export default function NotificationsCard() {
 
 	const [notifications, setNotifications] = useMMKVObject<NotificationData[] | undefined>("notifications")
 
-	const handlePress = (riskId: string | object) => {
+	const handlePress = (id: string, riskId: string) => {
 		navigation.navigate("RiskDetailsScreen", { riskId })
-		setNotifications(notifications?.filter((notification) => notification.riskId !== riskId) || [])
 
 		// Mark the notification as read
 		setNotifications(
-			notifications?.map((notification) => (notification.riskId === riskId ? { ...notification, read: true } : notification)),
+			notifications?.map((notification) => {
+				if (notification.id === id) {
+					return { ...notification, read: true }
+				}
+				return notification
+			}) || [],
 		)
 	}
 
@@ -44,7 +48,9 @@ export default function NotificationsCard() {
 			}
 		})
 
-		return unsubscribe
+		return () => {
+			unsubscribe()
+		}
 	}, [])
 
 	return (
@@ -61,12 +67,12 @@ export default function NotificationsCard() {
 				notifications
 					.filter((notification) => !notification?.read)
 					.slice(0, 2)
-					.map((notification, index) => (
+					.map((notification) => (
 						<NotificationItem
-							key={index}
+							key={notification.id}
 							notification={notification}
 							darkMode={darkMode}
-							onPress={() => handlePress(notification.riskId!)}
+							onPress={() => handlePress(notification.id, notification.riskId)}
 							showChevron
 							compact
 						/>

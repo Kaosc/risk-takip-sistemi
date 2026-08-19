@@ -1,7 +1,7 @@
 import { registerRootComponent } from "expo"
 import { I18nextProvider } from "react-i18next"
 import { Provider } from "react-redux"
-import messaging from "@react-native-firebase/messaging"
+import { getMessaging, setBackgroundMessageHandler } from "@react-native-firebase/messaging"
 
 import ToastNotification from "./src/components/ToastNotification"
 import { processNotification, saveNotification } from "./src/lib/notifications"
@@ -9,9 +9,11 @@ import { store } from "./src/store/store"
 import i18n from "./i18n"
 import App from "./App"
 
-messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+const messaging = getMessaging()
+
+setBackgroundMessageHandler(messaging, async (remoteMessage) => {
 	try {
-		console.info("Background message received!")
+		console.info("Arka planda mesaj alındı:", remoteMessage)
 		const notification = processNotification(remoteMessage)
 		if (notification) {
 			saveNotification(notification)
