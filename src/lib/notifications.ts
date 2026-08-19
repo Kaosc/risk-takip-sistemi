@@ -24,7 +24,11 @@ export const processNotification = (remoteMessage: RemoteMessage): NotificationD
 export const saveNotification = (notification: NotificationData) => {
 	try {
 		const notifications = getNotifications()
-		storeNotifications([notification, ...notifications])
+		if (!notifications) {
+			storeNotifications([notification])
+		} else {
+			storeNotifications([notification, ...notifications])
+		}
 	} catch (e) {
 		console.error("Notification kaydedilirken hata oluştu:", e)
 	}

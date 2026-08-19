@@ -110,22 +110,20 @@ export default function HomeScreen() {
 					</View>
 				</View>
 
-				{auth.role === "MEMBER" && (
-					<View
-						style={{
-							paddingHorizontal: 13,
-							paddingBottom: 20,
-							gap: 12,
-						}}
-					>
-						<ThemedButton
-							text={"Yeni Risk Ekle"}
-							icon={"plus-circle-outline"}
-							iconSize={22}
-							onPress={() => navigation.navigate("RiskFormScreen")}
-						/>
-					</View>
-				)}
+				<View
+					style={{
+						paddingHorizontal: 13,
+						paddingBottom: 20,
+						gap: 12,
+					}}
+				>
+					<ThemedButton
+						text={"Yeni Risk Ekle"}
+						icon={"plus-circle-outline"}
+						iconSize={22}
+						onPress={() => navigation.navigate("RiskFormScreen")}
+					/>
+				</View>
 			</ScrollView>
 		</View>
 	)

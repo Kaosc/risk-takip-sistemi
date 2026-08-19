@@ -1,6 +1,6 @@
 import { getFirestore, doc, getDoc, setDoc, query, where, collection, getDocs, updateDoc } from "@react-native-firebase/firestore"
 import { COLLECTIONS } from "../enums"
-import { getMessaging, getToken } from "@react-native-firebase/messaging"
+import { deleteToken, getMessaging, getToken } from "@react-native-firebase/messaging"
 import { getAuth } from "@react-native-firebase/auth"
 
 const db = getFirestore()
@@ -91,6 +91,8 @@ export const deleteUserFCMToken = async (): Promise<void> => {
 			console.debug("[FIRESTORE] deleteUserFCMToken: No authenticated user found.")
 			return
 		}
+
+		await deleteToken(messaging)
 
 		const userRef = doc(db, COLLECTIONS.USERS, user.uid)
 		await updateDoc(userRef, {
