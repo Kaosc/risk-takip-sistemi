@@ -52,7 +52,7 @@ export const login = async (email: string, password: string) => {
 	}
 }
 
-export const register = async (email: string, password: string, name: string) => {
+export const register = async (email: string, password: string, name: string, phoneNumber: string) => {
 	let uid: string | null = null
 	try {
 		const credential = await createUserWithEmailAndPassword(auth, email, password)
@@ -68,6 +68,7 @@ export const register = async (email: string, password: string, name: string) =>
 			name: name,
 			createdAt: new Date() as unknown as FirebaseTimestamp,
 			updatedAt: new Date() as unknown as FirebaseTimestamp,
+			phoneNumber: phoneNumber,
 		})
 
 		if (!addUserResult) {

@@ -14,6 +14,7 @@ import { Theme } from "../utils/theme"
 type RegisterFormData = {
 	name: string
 	email: string
+	phone: string
 	password: string
 	confirmPassword: string
 }
@@ -37,6 +38,7 @@ export default function RegisterScreen() {
 		defaultValues: {
 			name: "",
 			email: "",
+			phone: "",
 			password: "",
 			confirmPassword: "",
 		},
@@ -48,7 +50,7 @@ export default function RegisterScreen() {
 		setIsSubmitting(true)
 		setFirebaseError("")
 
-		const uid = await register(data.email, data.password, data.name)
+		const uid = await register(data.email, data.password, data.name, data.phone)
 		
 		if (uid) {
 			navigation.goBack()
@@ -110,8 +112,29 @@ export default function RegisterScreen() {
 						/>
 					)}
 				/>
-
+				
 				{errors.email && <Text style={styles.fieldError}>{errors.email.message}</Text>}
+
+				<Controller
+					control={control}
+					name="phone"
+					rules={{
+						required: "Telefon alanı zorunludur.",
+					}}
+					render={({ field: { onChange, onBlur, value } }) => (
+						<TextInput
+							style={[styles.input, errors.phone && styles.inputError]}
+							placeholder={"Telefon"}
+							placeholderTextColor="#888"
+							value={value}
+							onBlur={onBlur}
+							onChangeText={onChange}
+							keyboardType="phone-pad"
+						/>
+					)}
+				/>
+
+				{errors.phone && <Text style={styles.fieldError}>{errors.phone.message}</Text>}
 
 				<Controller
 					control={control}

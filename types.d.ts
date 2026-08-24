@@ -64,6 +64,7 @@ interface User {
 	email: string
 	role: UserRole
 	name: string
+	phoneNumber: string
 	fcmToken?: string | undefined
 	createdAt: FirebaseTimestamp
 	updatedAt: FirebaseTimestamp

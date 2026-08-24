@@ -254,11 +254,11 @@ export default function RiskDetailsScreen({
 
 	const [risk, setRisk] = useState<Risk>(route?.params?.risk ?? fallbackRisk)
 	const [assignedStaff, setAssignedStaff] = useState<{ uid: string; name: string } | null>(null)
-	const taskDescriptionRef = useRef("")
+	const [taskDescription, setTaskDescription] = useState("")
 	const [dueDate, setDueDate] = useState<Date | null>(null)
 	const [showDatePicker, setShowDatePicker] = useState(false)
 	const [isAssigning, setIsAssigning] = useState(false)
-	const completionNotesRef = useRef("")
+	const [completionNotes, setCompletionNotes] = useState("")
 	const [afterImages, setAfterImages] = useState<string[]>([])
 	const [pickerError, setPickerError] = useState("")
 	const [isPicking, setIsPicking] = useState(false)
@@ -321,7 +321,7 @@ export default function RiskDetailsScreen({
 			Alert.alert("Uyarı", "Lütfen görev atanacak personeli seçin.")
 			return
 		}
-		const description = taskDescriptionRef.current.trim()
+		const description = taskDescription.trim()
 		if (!description) {
 			Alert.alert("Uyarı", "Lütfen görev açıklaması girin.")
 			return
@@ -415,7 +415,7 @@ export default function RiskDetailsScreen({
 	}
 
 	const handleCompleteTask = async () => {
-		const notes = completionNotesRef.current.trim()
+		const notes = completionNotes.trim()
 		if (!notes) {
 			Alert.alert("Uyarı", "Lütfen tamamlanma notunu girin.")
 			return
@@ -483,8 +483,9 @@ export default function RiskDetailsScreen({
 						style={styles.input}
 						placeholder="Yapılacak işi kısaca açıklayın..."
 						placeholderTextColor="#888"
+						value={taskDescription}
 						onChangeText={(text) => {
-							taskDescriptionRef.current = text
+							setTaskDescription(text)
 						}}
 					/>
 
@@ -591,8 +592,9 @@ export default function RiskDetailsScreen({
 						multiline
 						numberOfLines={4}
 						textAlignVertical="top"
+						value={completionNotes}
 						onChangeText={(text) => {
-							completionNotesRef.current = text
+							setCompletionNotes(text)
 						}}
 					/>
 
@@ -742,8 +744,9 @@ export default function RiskDetailsScreen({
 						</View>
 					)}
 				</View>
-
-				<RenderRoleSection />
+				
+				{/* // Prevent re-rendering of the role section by using a function instead of a component */}
+				{RenderRoleSection()}
 
 				{role === "ADMIN" && (
 					<ThemedButton
