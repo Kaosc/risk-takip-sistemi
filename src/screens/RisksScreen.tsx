@@ -83,23 +83,11 @@ export default function RisksScreen({
 
 	const theme = Theme[darkMode ? "dark" : "light"]
 
-	const severityBadgeColor: Record<RiskSeverity, { bg: string; txt: string }> = {
-		low: {
-			bg: theme.primary.bg,
-			txt: theme.primary.fg,
-		},
-		medium: {
-			bg: theme.green.bg,
-			txt: theme.green.fg,
-		},
-		high: {
-			bg: theme.orange.bg,
-			txt: theme.orange.fg,
-		},
-		critical: {
-			bg: theme.red.bg,
-			txt: theme.red.fg,
-		},
+	const severityBadgeColor: Record<RiskSeverity, string> = {
+		low: theme.primary.fg,
+		medium: theme.green.fg,
+		high: theme.orange.fg,
+		critical: theme.red.fg,
 	}
 
 	const statusBadgeColor: Record<RiskStatus, { bg: string; txt: string }> = {
@@ -160,22 +148,24 @@ export default function RisksScreen({
 					<ThemedText style={styles.metaText}>{t(item.location)}</ThemedText>
 				</View>
 
-				<View style={styles.badgeRow}>
-					<View
+				<View style={styles.metaRow}>
+					<ThemedIcon
+						name="alert-circle-outline"
+						size={18}
+					/>
+					<ThemedText
 						style={[
-							styles.badge,
+							styles.metaText,
 							{
-								flex: 0,
-								alignItems: "flex-start",
-								backgroundColor: severityBadgeColor[item.severity].bg,
-								borderColor: severityBadgeColor[item.severity].txt,
+								color: severityBadgeColor[item.severity],
 							},
 						]}
 					>
-						<ThemedText style={[styles.badgeText, { color: severityBadgeColor[item.severity].txt }]}>
-							<ThemedText>Önem: </ThemedText> {t(item.severity)}
-						</ThemedText>
-					</View>
+						{t(item.severity)}
+					</ThemedText>
+				</View>
+
+				<View style={styles.badgeRow}>
 					<View
 						style={[
 							styles.badge,
@@ -187,9 +177,7 @@ export default function RisksScreen({
 							},
 						]}
 					>
-						<ThemedText style={[styles.badgeText, { color: statusBadgeColor[item.status].txt }]}>
-							<ThemedText>Durum: </ThemedText> {t(item.status)}
-						</ThemedText>
+						<ThemedText style={[styles.badgeText, { color: statusBadgeColor[item.status].txt }]}>{t(item.status)}</ThemedText>
 					</View>
 				</View>
 			</View>
@@ -247,7 +235,7 @@ export default function RisksScreen({
 
 	return (
 		<View style={styles.container}>
-			<CustomHeader title={role === "ADMIN" ? "Raporlar" : "Raporlarım"} />
+			<CustomHeader title={role === "ADMIN" ? "Riskler" : "Risklerim"} />
 			<FlatList
 				data={filteredRisks}
 				keyExtractor={(item) => item.id}
@@ -298,7 +286,7 @@ const createStyles = (darkMode: boolean) => {
 		cardWrapper: {
 			borderRadius: 16,
 			overflow: "hidden",
-			marginHorizontal: 18,
+			marginHorizontal: 12,
 		},
 		tabRow: {
 			paddingVertical: 12,
