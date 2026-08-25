@@ -190,13 +190,13 @@ export default function RisksScreen({
 					</View>
 				</View>
 
-				<ThemedText
-					style={styles.description}
-					numberOfLines={2}
-					lineBreakMode="tail"
-				>
-					{item.description}
-				</ThemedText>
+					<ThemedText
+						style={styles.description}
+						numberOfLines={2}
+						ellipsizeMode="tail"
+					>
+						{item.description}
+					</ThemedText>
 
 				<View style={styles.metaRow}>
 					<View style={styles.metaCell}>
@@ -336,7 +336,7 @@ const createStyles = (darkMode: boolean) => {
 		listContent: {
 			gap: 12,
 			flexGrow: 1,
-			paddingBottom: BOTTOM_TAB_HEIGHT,
+			paddingBottom: 20,
 		},
 		card: {
 			borderRadius: 16,
@@ -423,9 +423,10 @@ const createStyles = (darkMode: boolean) => {
 			fontWeight: "700",
 		},
 		description: {
-			fontSize: 13,
+			fontSize: 15,
 			lineHeight: 19,
 			opacity: 0.75,
+			marginVertical: 5,
 		},
 		metaRow: {
 			flex: 1,
