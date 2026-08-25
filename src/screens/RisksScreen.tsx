@@ -193,6 +193,7 @@ export default function RisksScreen({
 				<ThemedText
 					style={styles.description}
 					numberOfLines={2}
+					lineBreakMode="tail"
 				>
 					{item.description}
 				</ThemedText>
