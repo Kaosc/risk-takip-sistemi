@@ -15,6 +15,7 @@ import {
 	getDoc,
 } from "@react-native-firebase/firestore"
 import { COLLECTIONS } from "../enums"
+import { deleteImagesByRiskId } from "../storage"
 
 const db = getFirestore()
 
@@ -170,12 +171,12 @@ export const getRiskById = async (riskId: string): Promise<Risk | null> => {
 	}
 }
 
-export const deleteRiskById = async (riskId: string): Promise<{ success: boolean; error?: string }> => {
+export const deleteRiskById = async (riskId: string, imageUrls: string[]): Promise<{ success: boolean; error?: string }> => {
 	try {
 		await deleteDoc(doc(db, COLLECTIONS.RISKS, riskId))
+		await deleteImagesByRiskId(imageUrls)
 		return { success: true }
-	}
-	catch (error: any) {
+	} catch (error: any) {
 		console.error("Risk silinirken hata oluştu:", error)
 		return { success: false, error: error.message }
 	}

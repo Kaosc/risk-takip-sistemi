@@ -1,4 +1,4 @@
-import { getDownloadURL, getStorage, putFile, ref } from "@react-native-firebase/storage"
+import { getDownloadURL, getStorage, putFile, ref, deleteObject } from "@react-native-firebase/storage"
 
 const storage = getStorage()
 
@@ -38,3 +38,19 @@ export const uploadImages = async (
 	}
 }
 
+export const deleteImagesByRiskId = async (urls: string[]): Promise<{ success: boolean; error?: string }> => {
+	try {
+		if (!urls || urls.length === 0) {
+			return { success: true }
+		}
+		for (const url of urls) {
+			const reference = ref(storage, url)
+			await deleteObject(reference)
+			console.info(`Görsel silindi: ${url}`)
+		}
+		return { success: true }
+	} catch (error: any) {
+		console.error("deleteImagesByRiskId hatası:", error?.message || error)
+		return { success: false, error: error?.message || "Görseller silinirken bir hata oluştu." }
+	}
+}

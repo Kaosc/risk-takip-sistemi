@@ -379,7 +379,7 @@ export default function RiskDetailsScreen({
 		setPickerError("")
 		setIsPicking(true)
 		try {
-			const result = await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 0.7 })
+			const result = await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 0.65 })
 			if (!result.canceled && result.assets && result.assets.length > 0) {
 				addAfterImages(result.assets.map((a) => a.uri))
 			}
@@ -744,7 +744,7 @@ export default function RiskDetailsScreen({
 						</View>
 					)}
 				</View>
-				
+
 				{/* // Prevent re-rendering of the role section by using a function instead of a component */}
 				{RenderRoleSection()}
 
@@ -752,8 +752,8 @@ export default function RiskDetailsScreen({
 					<ThemedButton
 						text="Kaydı Sil"
 						icon="trash-can-outline"
-						onPress={() => {
-							deleteRiskById(risk.id)
+						onPress={async () => {
+							await deleteRiskById(risk.id, risk.images)
 							navigation.goBack()
 						}}
 						style={{
