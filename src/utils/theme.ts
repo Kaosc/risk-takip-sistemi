@@ -86,7 +86,7 @@ export const Theme = {
 			fg: "#8e24aa",
 		},
 		primary: {
-			bg: "#bbbbbb",
+			bg: "#dbdbdb",
 			fg: "#000000",
 		},
 	},

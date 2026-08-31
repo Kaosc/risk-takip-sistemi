@@ -1,7 +1,6 @@
-- send notification to user who created the risk on every status changes
 - stack search screen for risk screen  
-- add 2 bottomsheet to risksScreen to filter risks by status and risk severity instead of tabbar
 - add floating button to risks screen to add risk  (maybe remove the add risk button from home screen)
+- add statistics screen to show risk statistics (daily, weekly, monthly) from count of risk & severity types
 
 # ?
    - Should staff or admin be able add risk?

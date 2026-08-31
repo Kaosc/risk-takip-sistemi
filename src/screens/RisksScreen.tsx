@@ -1,19 +1,24 @@
-import { useCallback, useMemo, useState } from "react"
-import { FlatList, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
+import { useCallback, useMemo, useRef, useState } from "react"
+import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native"
 import { useSelector } from "react-redux"
 import { useNavigation, NavigationProp, useFocusEffect } from "@react-navigation/native"
 import { useTranslation } from "react-i18next"
 import { Image } from "expo-image"
+import BottomSheet from "@gorhom/bottom-sheet"
 
 import ThemedText from "../components/ui/ThemedText"
 import ThemedIcon from "../components/ui/ThemedIcon"
 import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
+import ThemedBottomSheet from "../components/ui/ThemedBottomSheet"
 import CustomHeader from "../components/CustomHeader"
 
 import { getAllRisks, getRisksAssignedToStaff, getRisksByUserId } from "../lib/firebase/firestore/risks"
 import { Theme } from "../utils/theme"
 import { AllIconNames } from "../types/icon"
 import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
+
+const severityOptions: RiskSeverity[] = ["low", "medium", "high", "critical"]
+const typeOptions: RiskType[] = ["risk", "accident", "nearmiss"]
 
 export default function RisksScreen({
 	route,
@@ -34,13 +39,19 @@ export default function RisksScreen({
 	const [risks, setRisks] = useState<Risk[]>([])
 	const [loading, setLoading] = useState(true)
 	const [statusFilter, setStatusFilter] = useState<RiskStatus | null>()
+	const [severityFilter, setSeverityFilter] = useState<RiskSeverity | null>(null)
+	const [typeFilter, setTypeFilter] = useState<RiskType | null>(null)
+	const [activeFilter, setActiveFilter] = useState<"severity" | "type" | null>(null)
+	const sheetRef = useRef<BottomSheet | null>(null)
 
 	const filteredRisks = useMemo(() => {
-		if (statusFilter) {
-			return risks.filter((risk) => risk.status === statusFilter)
-		}
-		return risks
-	}, [risks, statusFilter])
+		return risks.filter(
+			(risk) =>
+				(!statusFilter || risk.status === statusFilter) &&
+				(!severityFilter || risk.severity === severityFilter) &&
+				(!typeFilter || risk.type === typeFilter),
+		)
+	}, [risks, statusFilter, severityFilter, typeFilter])
 
 	useFocusEffect(
 		useCallback(() => {
@@ -125,6 +136,41 @@ export default function RisksScreen({
 		nearmiss: "alert-circle-outline",
 	}
 
+	const openSheet = (filter: "severity" | "type") => {
+		setActiveFilter(filter)
+		sheetRef.current?.expand()
+	}
+
+	const handleSelectSeverity = (severity: RiskSeverity) => {
+		setSeverityFilter(severity)
+		sheetRef.current?.close()
+	}
+
+	const handleSelectType = (type: RiskType) => {
+		setTypeFilter(type)
+		sheetRef.current?.close()
+	}
+
+	const clearFilters = () => {
+		setSeverityFilter(null)
+		setTypeFilter(null)
+		setStatusFilter(null)
+	}
+
+	const sheetItems =
+		activeFilter === "severity"
+			? severityOptions.map((option) => ({
+					text: t(option),
+					onPress: () => handleSelectSeverity(option),
+				}))
+			: activeFilter === "type"
+				? typeOptions.map((option) => ({
+						text: t(option),
+						icon: typeIconMap[option],
+						onPress: () => handleSelectType(option),
+					}))
+				: []
+
 	const renderItem = ({ item }: { item: Risk }) => (
 		<TouchableOpacity
 			style={styles.card}
@@ -190,13 +236,13 @@ export default function RisksScreen({
 					</View>
 				</View>
 
-					<ThemedText
-						style={styles.description}
-						numberOfLines={2}
-						ellipsizeMode="tail"
-					>
-						{item.description}
-					</ThemedText>
+				<ThemedText
+					style={styles.description}
+					numberOfLines={2}
+					ellipsizeMode="tail"
+				>
+					{item.description}
+				</ThemedText>
 
 				<View style={styles.metaRow}>
 					<View style={styles.metaCell}>
@@ -239,52 +285,59 @@ export default function RisksScreen({
 		</TouchableOpacity>
 	)
 
-	const TabButtons = () => {
-		const tabs = (): RiskStatus[] => {
-			if (role === "ADMIN") {
-				return ["new", "inprogress", "pending", "completed"]
-			} else if (role === "STAFF") {
-				return ["inprogress", "pending", "completed"]
-			} else {
-				return ["new", "inprogress", "pending", "completed"]
-			}
-		}
+	const FilterButtons = () => {
+		const hasActiveFilter = Boolean(severityFilter || typeFilter || statusFilter)
+		const activeColor = darkMode ? "#000000" : "#ffffff"
 
 		return (
-			<ScrollView
-				horizontal
-				style={styles.tabRow}
-				contentContainerStyle={{ flexGrow: 1, justifyContent: "space-around", gap: 10 }}
-				showsHorizontalScrollIndicator={false}
-			>
-				{tabs().map((status) => (
+			<View>
+				<View style={styles.filterRow}>
 					<TouchableOpacity
-						key={status}
-						style={[
-							styles.badge,
-							{
-								minHeight: 34,
-								paddingHorizontal: 14,
-								paddingVertical: 6,
-								backgroundColor: statusBadgeColor[status].bg,
-								borderColor: statusBadgeColor[status].txt,
-								opacity: statusFilter === status ? 1 : 0.35,
-							},
-						]}
-						onPress={() => {
-							if (statusFilter === status) {
-								setStatusFilter(null)
-							} else {
-								setStatusFilter(status)
-							}
-						}}
+						style={[styles.filterButton, severityFilter && styles.filterButtonActive]}
+						activeOpacity={0.7}
+						onPress={() => openSheet("severity")}
 					>
-						<ThemedText style={[styles.badgeLabel, { color: statusBadgeColor[status].txt, fontSize: 14 }]}>
-							{t(status)}
+						<ThemedIcon
+							name="alert-circle-outline"
+							size={16}
+							color={severityFilter ? activeColor : undefined}
+						/>
+						<ThemedText style={[styles.filterButtonText, severityFilter && styles.filterButtonTextActive]}>
+							{severityFilter ? t(severityFilter) : t("severity")}
 						</ThemedText>
 					</TouchableOpacity>
-				))}
-			</ScrollView>
+
+					<TouchableOpacity
+						style={[styles.filterButton, typeFilter && styles.filterButtonActive]}
+						activeOpacity={0.7}
+						onPress={() => openSheet("type")}
+					>
+						<ThemedIcon
+							name="shield-alert-outline"
+							size={16}
+							color={typeFilter ? activeColor : undefined}
+						/>
+						<ThemedText style={[styles.filterButtonText, typeFilter && styles.filterButtonTextActive]}>
+							{typeFilter ? t(typeFilter) : t("type")}
+						</ThemedText>
+					</TouchableOpacity>
+				</View>
+
+				{hasActiveFilter && (
+					<TouchableOpacity
+						style={styles.clearButton}
+						activeOpacity={0.7}
+						onPress={clearFilters}
+					>
+						<ThemedIcon
+							name="close-circle-outline"
+							size={16}
+							color={activeColor}
+						/>
+						<ThemedText style={[styles.filterButtonText, styles.filterButtonTextActive]}>Filtreleri Temizle</ThemedText>
+					</TouchableOpacity>
+				)}
+			</View>
 		)
 	}
 
@@ -297,7 +350,7 @@ export default function RisksScreen({
 				renderItem={renderItem}
 				style={styles.list}
 				contentContainerStyle={styles.listContent}
-				ListHeaderComponent={<TabButtons />}
+				ListHeaderComponent={<FilterButtons />}
 				refreshing={loading}
 				onRefresh={onRefresh}
 				showsVerticalScrollIndicator={false}
@@ -311,6 +364,12 @@ export default function RisksScreen({
 						<ThemedText style={styles.emptyText}>Kayıt bulunamadı.</ThemedText>
 					</View>
 				}
+			/>
+
+			<ThemedBottomSheet
+				ref={sheetRef}
+				snapPoints={["40%"]}
+				items={sheetItems}
 			/>
 		</View>
 	)
@@ -378,11 +437,45 @@ const createStyles = (darkMode: boolean) => {
 			fontWeight: "600",
 			opacity: 0.5,
 		},
-		tabRow: {
-			paddingVertical: 12,
+		filterRow: {
+			flexDirection: "row",
+			gap: 10,
+			marginHorizontal: 12,
+			marginTop: 12,
+		},
+		filterButton: {
+			flex: 1,
+			flexDirection: "row",
+			alignItems: "center",
+			justifyContent: "center",
+			gap: 8,
+			paddingVertical: 10,
 			borderRadius: 12,
-			marginHorizontal: 10,
+			borderWidth: 1,
+			borderColor: theme.border,
+			backgroundColor: theme.cardBackground,
+		},
+		filterButtonActive: {
+			backgroundColor: theme.text,
+			borderColor: theme.text,
+		},
+		filterButtonText: {
+			fontSize: 14,
+			fontWeight: "700",
+		},
+		filterButtonTextActive: {
+			color: darkMode ? "#000000" : "#ffffff",
+		},
+		clearButton: {
+			flexDirection: "row",
+			alignItems: "center",
+			justifyContent: "center",
+			gap: 8,
 			marginTop: 10,
+			marginHorizontal: 12,
+			paddingVertical: 10,
+			borderRadius: 12,
+			backgroundColor: theme.text,
 		},
 		cardBody: {
 			padding: 14,
@@ -451,16 +544,6 @@ const createStyles = (darkMode: boolean) => {
 		severityText: {
 			fontSize: 13,
 			fontWeight: "700",
-		},
-		badge: {
-			paddingHorizontal: 10,
-			paddingVertical: 4,
-			borderRadius: 99,
-			borderWidth: 1,
-			borderColor: theme.border,
-			backgroundColor: darkMode ? "#1f1f22" : "#ffffff",
-			flex: 1,
-			alignItems: "center",
 		},
 		badgeLabel: {
 			fontSize: 12,
