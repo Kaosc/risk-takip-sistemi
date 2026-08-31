@@ -1,0 +1,277 @@
+import { View, TouchableOpacity, StyleSheet } from "react-native"
+import React from "react"
+import { Image } from "expo-image"
+import ThemedIcon from "./ui/ThemedIcon"
+import ThemedText from "./ui/ThemedText"
+import { typeIconMap } from "../lib/constants"
+import { useSelector } from "react-redux"
+import { Theme } from "../utils/theme"
+import { useTranslation } from "react-i18next"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+
+export default function RiskCard({ item }: { item: Risk }) {
+	const navigation = useNavigation() as NavigationProp<any>
+	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
+	const theme = Theme[darkMode ? "dark" : "light"]
+	const styles = createStyles(darkMode)
+	const { t } = useTranslation()
+
+	const severityBadgeColor: Record<RiskSeverity, string> = {
+		low: theme.primary.fg,
+		medium: theme.green.fg,
+		high: theme.orange.fg,
+		critical: theme.red.fg,
+	}
+
+	const statusBadgeColor: Record<RiskStatus, { bg: string; txt: string }> = {
+		new: {
+			bg: theme.primary.bg,
+			txt: theme.primary.fg,
+		},
+		inprogress: {
+			bg: theme.blue.bg,
+			txt: theme.blue.fg,
+		},
+		pending: {
+			bg: theme.orange.bg,
+			txt: theme.orange.fg,
+		},
+		completed: {
+			bg: theme.green.bg,
+			txt: theme.green.fg,
+		},
+	}
+
+	return (
+		<TouchableOpacity
+			style={styles.card}
+			activeOpacity={0.7}
+			onPress={() => navigation.navigate("RiskDetailsScreen", { risk: item })}
+		>
+			{item.images?.[0] ? (
+				<View>
+					<Image
+						source={{ uri: item.images[0] }}
+						style={styles.cardImage}
+						contentFit="cover"
+						transition={200}
+					/>
+					{item.images.length > 1 && (
+						<View style={styles.imageCountBadge}>
+							<ThemedIcon
+								name="image-multiple-outline"
+								size={12}
+								color="#ffffff"
+							/>
+							<ThemedText style={styles.imageCountText}>{item.images.length}</ThemedText>
+						</View>
+					)}
+				</View>
+			) : (
+				<View style={[styles.cardImage, styles.cardImagePlaceholder]}>
+					<ThemedIcon
+						name={typeIconMap[item.type]}
+						size={38}
+					/>
+					<ThemedText style={styles.noImageLabel}>{t(item.type)}</ThemedText>
+				</View>
+			)}
+
+			<View style={styles.cardBody}>
+				<View style={styles.headerRow}>
+					<View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 10, minWidth: 0 }}>
+						<View style={styles.typeBadge}>
+							<ThemedIcon
+								name={typeIconMap[item.type]}
+								size={14}
+							/>
+							<ThemedText style={styles.badgeLabel}>{t(item.type)}</ThemedText>
+						</View>
+						<View style={styles.severityRow}>
+							<ThemedIcon
+								name="alert-circle-outline"
+								size={15}
+								color={severityBadgeColor[item.severity]}
+							/>
+							<ThemedText style={[styles.severityText, { color: severityBadgeColor[item.severity] }]}>
+								{t(item.severity)}
+							</ThemedText>
+						</View>
+					</View>
+
+					<View style={[styles.statusBadge, { backgroundColor: statusBadgeColor[item.status].bg }]}>
+						<View style={[styles.statusDot, { backgroundColor: statusBadgeColor[item.status].txt }]} />
+						<ThemedText style={[styles.statusBadgeText, { color: statusBadgeColor[item.status].txt }]}>
+							{t(item.status)}
+						</ThemedText>
+					</View>
+				</View>
+
+				<ThemedText
+					style={styles.description}
+					numberOfLines={2}
+					ellipsizeMode="tail"
+				>
+					{item.description}
+				</ThemedText>
+
+				<View style={styles.metaRow}>
+					<View style={styles.metaCell}>
+						<ThemedIcon
+							name="tag-outline"
+							size={15}
+						/>
+						<ThemedText
+							style={styles.metaText}
+							numberOfLines={1}
+						>
+							{t(item.category)}
+						</ThemedText>
+					</View>
+					<View style={styles.metaCell}>
+						<ThemedIcon
+							name="map-marker-outline"
+							size={15}
+						/>
+						<ThemedText
+							style={styles.metaText}
+							numberOfLines={1}
+						>
+							{t(item.location)}
+						</ThemedText>
+					</View>
+				</View>
+
+				<ThemedText
+					style={{
+						fontSize: 12,
+						fontWeight: "600",
+						opacity: 0.5,
+						textAlign: "right",
+					}}
+				>
+					{item.id}
+				</ThemedText>
+			</View>
+		</TouchableOpacity>
+	)
+}
+
+const createStyles = (darkMode: boolean) => {
+	const theme = Theme[darkMode ? "dark" : "light"]
+
+	return StyleSheet.create({
+		card: {
+			borderRadius: 16,
+			overflow: "hidden",
+			marginHorizontal: 12,
+			backgroundColor: theme.cardBackground,
+			borderWidth: 1,
+			borderColor: theme.border,
+		},
+		cardImage: {
+			width: "100%",
+			height: 150,
+			backgroundColor: darkMode ? "#1c1c1c" : "#e8e8e8",
+		},
+		cardImagePlaceholder: {
+			alignItems: "center",
+			justifyContent: "center",
+			gap: 8,
+		},
+		imageCountBadge: {
+			position: "absolute",
+			right: 10,
+			bottom: 10,
+			flexDirection: "row",
+			alignItems: "center",
+			gap: 4,
+			paddingHorizontal: 9,
+			paddingVertical: 4,
+			borderRadius: 99,
+			backgroundColor: "rgba(0,0,0,0.65)",
+		},
+		imageCountText: {
+			fontSize: 12,
+			fontWeight: "700",
+			color: "#ffffff",
+		},
+		noImageLabel: {
+			fontSize: 13,
+			fontWeight: "600",
+			opacity: 0.5,
+		},
+		cardBody: {
+			padding: 14,
+			gap: 10,
+		},
+		headerRow: {
+			flexDirection: "row",
+			alignItems: "center",
+			justifyContent: "space-between",
+			gap: 8,
+		},
+		typeBadge: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: 6,
+			paddingHorizontal: 10,
+			paddingVertical: 5,
+			borderRadius: 99,
+			borderWidth: 1,
+			borderColor: theme.border,
+			backgroundColor: darkMode ? "#1e1e1e" : "#ffffff",
+		},
+		statusBadge: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: 6,
+			paddingHorizontal: 10,
+			paddingVertical: 5,
+			borderRadius: 99,
+		},
+		statusDot: {
+			width: 7,
+			height: 7,
+			borderRadius: 99,
+		},
+		statusBadgeText: {
+			fontSize: 12,
+			fontWeight: "700",
+		},
+		description: {
+			fontSize: 15,
+			lineHeight: 19,
+			opacity: 0.75,
+			marginVertical: 5,
+		},
+		metaRow: {
+			flex: 1,
+			flexDirection: "row",
+			alignItems: "center",
+			gap: 10,
+		},
+		metaCell: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: 6,
+			minWidth: 0,
+		},
+		metaText: {
+			fontSize: 13,
+		},
+		severityRow: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: 6,
+		},
+		severityText: {
+			fontSize: 13,
+			fontWeight: "700",
+		},
+		badgeLabel: {
+			fontSize: 12,
+			fontWeight: "600",
+		},
+	})
+}
