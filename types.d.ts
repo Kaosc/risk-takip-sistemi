@@ -144,3 +144,22 @@ type NotificationData = {
 	riskId: string
 	read: boolean
 }
+
+///////////////////////////////////////////////////
+////////////////// STATISTICS /////////////////////
+///////////////////////////////////////////////////
+
+type RiskStatistics = {
+	total: number
+	byStatus: Record<RiskStatus, number>
+	bySeverity: Record<RiskSeverity, number>
+	byType: Record<RiskType, number>
+	byCategory: Record<string, number>
+	byAssignedStaff: Record<string, number>
+	byMonth: Record<string, number>
+	unassignedCount: number
+	thisWeek: number
+	lastWeek: number
+	thisMonth: number
+	lastMonth: number
+}

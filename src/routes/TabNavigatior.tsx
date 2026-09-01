@@ -8,6 +8,7 @@ import RisksStack from "./stacks/RisksStack"
 
 import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
 import SettingsScreen from "../screens/SettingsScreen"
+import StatisticsScreen from "../screens/StatisticsScreen"
 
 const Tabs = createBottomTabNavigator()
 
@@ -69,6 +70,20 @@ export default function TabNavigator() {
 						/>
 					),
 					tabBarLabel: role === "MEMBER" ? "Raporlarım" : "Raporlar",
+				}}
+			/>
+			<Tabs.Screen
+				name="StatisticsScreen"
+				component={StatisticsScreen}
+				options={{
+					tabBarIcon: (v) => (
+						<ThemedIcon
+							name={v.focused ? "chart-bar" : "chart-bar-stacked"}
+							size={29}
+							color={v.color}
+						/>
+					),
+					tabBarLabel: "İstatistikler",
 				}}
 			/>
 			<Tabs.Screen

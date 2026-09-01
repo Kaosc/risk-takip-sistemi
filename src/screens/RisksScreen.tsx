@@ -228,6 +228,7 @@ export default function RisksScreen({
 		<View style={styles.container}>
 			<CustomHeader
 				title={role === "ADMIN" ? "Riskler" : "Risklerim"}
+				showBackButton={false}
 				rightComponent={
 					<TouchableOpacity onPress={() => navigation.navigate("SearchScreen")}>
 						<ThemedIcon
@@ -258,6 +259,18 @@ export default function RisksScreen({
 					</View>
 				}
 			/>
+
+			<TouchableOpacity
+				style={styles.fab}
+				activeOpacity={0.7}
+				onPress={() => navigation.navigate("RiskFormScreen")}
+			>
+				<ThemedIcon
+					name="plus"
+					size={24}
+					color={darkMode ? "#000000" : "#ffffff"}
+				/>
+			</TouchableOpacity>
 
 			<ThemedBottomSheet
 				ref={sheetRef}
@@ -341,6 +354,22 @@ const createStyles = (darkMode: boolean) => {
 			fontSize: 15,
 			opacity: 0.6,
 			textAlign: "center",
+		},
+		fab: {
+			position: "absolute",
+			right: 20,
+			bottom: 20,
+			width: 56,
+			height: 56,
+			borderRadius: 28,
+			alignItems: "center",
+			justifyContent: "center",
+			backgroundColor: theme.text,
+			shadowColor: "#000",
+			shadowOffset: { width: 0, height: 2 },
+			shadowOpacity: 0.25,
+			shadowRadius: 4,
+			elevation: 5,
 		},
 	})
 }

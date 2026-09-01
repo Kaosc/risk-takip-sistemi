@@ -47,7 +47,7 @@ export default function SettingsScreen() {
 
 	return (
 		<>
-			<CustomHeader title={t("settings")} />
+			<CustomHeader title={t("settings")} showBackButton={false} />
 			<ScrollView
 				style={{ flex: 1 }}
 				contentContainerStyle={{ flexGrow: 1, paddingBottom: 20, paddingTop: 22, gap: 10 }}
@@ -150,37 +150,6 @@ const createStyles = (darkMode: boolean) => {
 			flexDirection: "row",
 			gap: 10,
 			flex: 1,
-		},
-		dangerZoneCard: {
-			backgroundColor: theme.red.background,
-			borderColor: theme.red.foreground,
-			gap: 20,
-			padding: 25,
-			marginHorizontal: 13,
-			borderRadius: 16,
-			borderWidth: 1,
-		},
-		dangerTitle: {
-			fontSize: 18,
-			fontWeight: "900",
-		},
-		dangerText: {
-			fontSize: 14,
-			flexWrap: "wrap",
-			flex: 1,
-		},
-		dangerButtonText: {
-			fontSize: 16,
-			fontWeight: "900",
-		},
-		dangerButton: {
-			flexDirection: "row",
-			borderWidth: 1,
-			paddingVertical: 10,
-			paddingHorizontal: 16,
-			borderRadius: 99,
-			gap: 10,
-			borderColor: theme.red.foreground,
 		},
 	})
 }

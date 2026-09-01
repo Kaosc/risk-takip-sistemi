@@ -13,6 +13,7 @@ import CustomHeader from "../components/CustomHeader"
 import { Theme } from "../utils/theme"
 import { logout } from "../lib/firebase/auth"
 import { clearUser } from "../utils/storage"
+import { roleNameMap } from "../lib/constants"
 
 const getInitials = (name?: string) =>
 	name
@@ -81,7 +82,7 @@ export default function HomeScreen() {
 								{auth.name || "Guest"}
 							</ThemedText>
 							<View style={styles.roleBadge}>
-								<ThemedText style={styles.roleBadgeText}>{(auth.role || "MEMBER").toLowerCase()}</ThemedText>
+								<ThemedText style={styles.roleBadgeText}>{roleNameMap[auth.role || "MEMBER"]}</ThemedText>
 							</View>
 							<ThemedText
 								style={styles.profileEmail}
@@ -192,16 +193,16 @@ const createStyles = (darkMode: boolean) => {
 		},
 		roleBadge: {
 			alignSelf: "flex-start",
-			paddingHorizontal: 10,
+			paddingHorizontal: 12,
 			paddingVertical: 3,
 			borderRadius: 99,
-			backgroundColor: darkMode ? "#fff" : "#000",
+			backgroundColor: darkMode ? "#3f3f3f" : "#000",
 		},
 		roleBadgeText: {
-			fontSize: 12,
+			fontSize: 13,
 			fontWeight: "700",
 			textTransform: "uppercase",
-			color: darkMode ? "#000" : "#fff",
+			color: darkMode ? "#ffffff" : "#fff",
 		},
 		profileEmail: {
 			fontSize: 13,

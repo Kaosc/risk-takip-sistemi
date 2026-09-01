@@ -12,3 +12,9 @@ export const typeIconMap: Record<RiskType, AllIconNames> = {
 	accident: "ambulance",
 	nearmiss: "alert-circle-outline",
 }
+
+export const roleNameMap 	: Record<UserRole, string> = {
+	ADMIN: "İSG PERSONELİ",
+	STAFF: "SAHA PERSONELİ",
+	MEMBER: "ÇALIŞAN",
+}
