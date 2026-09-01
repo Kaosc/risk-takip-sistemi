@@ -22,6 +22,7 @@ import { assignRiskToStaff, deleteRiskById, getRiskById, updateRisk, updateStatu
 import { uploadImages } from "../lib/firebase/storage"
 import { serverTimestamp } from "@react-native-firebase/firestore"
 import { useTranslation } from "react-i18next"
+import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 
 const fallbackRisk: Risk = {
 	id: "",
@@ -598,14 +599,18 @@ export default function RiskDetailsScreen({
 						}}
 					/>
 
-					<ThemedButton
-						text="Gönder ve Tamamla"
-						icon="check"
-						onPress={handleCompleteTask}
-						style={{ marginVertical: 12, backgroundColor: theme.green.bg, borderColor: theme.green.fg, borderWidth: 1 }}
-						iconColor={theme.green.fg}
-						textStyle={{ color: theme.green.fg }}
-					/>
+					{loading ? (
+						<ThemedActivityIndicator size="large" />
+					) : (
+						<ThemedButton
+							text="Gönder ve Tamamla"
+							icon="check"
+							onPress={handleCompleteTask}
+							style={{ marginVertical: 12, backgroundColor: theme.green.bg, borderColor: theme.green.fg, borderWidth: 1 }}
+							iconColor={theme.green.fg}
+							textStyle={{ color: theme.green.fg }}
+						/>
+					)}
 				</View>
 			)
 		}
