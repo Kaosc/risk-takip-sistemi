@@ -291,6 +291,16 @@ export default function RiskDetailsScreen({
 	const fetchStaffs = async () => {
 		if (role === "ADMIN") {
 			const fetchedStaffs = await getStaffs()
+
+			if (risk.status === "inprogress") {
+				const theStaff = fetchedStaffs.find((s) => s.uid === risk.assignedToId)
+				setAssignedStaff({
+					uid: theStaff?.uid || "",
+					name: theStaff?.name || "Bilinmeyen Personel",
+				})
+				return
+			}
+
 			if (fetchedStaffs.length > 0) {
 				setSheetItems(
 					fetchedStaffs.map((staff) => ({
@@ -463,6 +473,7 @@ export default function RiskDetailsScreen({
 			setLoading(false)
 		}
 	}
+
 	//////////////////////////// ROLE SECTION ////////////////////////////
 
 	const RenderRoleSection = () => {
@@ -546,8 +557,23 @@ export default function RiskDetailsScreen({
 						},
 					]}
 				>
-					<ThemedText style={styles.sectionTitle}>Görev Devam Ediyor</ThemedText>
+					<View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 4 }}>
+						<ThemedIcon
+							name="clock-outline"
+							size={24}
+						/>
+						<ThemedText style={styles.sectionTitle}>Görev Devam Ediyor</ThemedText>
+					</View>
 					<ThemedText style={styles.sectionHint}>Bu görev personel'e atandı ve çalışma sürecinde.</ThemedText>
+
+					<ThemedText style={[styles.fieldLabel]}>Personel</ThemedText>
+					<ThemedText style={styles.description}>{assignedStaff?.name || "-"}</ThemedText>
+
+					<ThemedText style={styles.fieldLabel}>Görev Açıklaması</ThemedText>
+					<ThemedText style={styles.description}>{risk.taskDescription || "-"}</ThemedText>
+
+					<ThemedText style={styles.fieldLabel}>Bitiş Tarihi (Termin)</ThemedText>
+					<ThemedText style={styles.description}>{risk.dueDate ? safeTimestampToDateString(risk.dueDate) : "-"}</ThemedText>
 				</View>
 			)
 		}
@@ -861,7 +887,6 @@ const createStyles = (darkMode: boolean) => {
 		fieldLabel: {
 			fontSize: 15,
 			fontWeight: "900",
-			opacity: 0.8,
 			marginTop: 8,
 		},
 		selectField: {

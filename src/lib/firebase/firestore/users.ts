@@ -103,3 +103,25 @@ export const deleteUserFCMToken = async (): Promise<void> => {
 		console.debug("[FIRESTORE] deleteUserFCMToken error:", error)
 	}
 }
+
+export const getStaffNameById = async (uid: string | undefined): Promise<string | null> => {
+	if (!uid) {
+		console.debug("[FIRESTORE] getStaffNameById: UID is undefined.")
+		return null
+	}
+
+	try {
+		const docRef = doc(db, COLLECTIONS.USERS, uid)
+		const docSnap = await getDoc(docRef)
+
+		if (docSnap.exists()) {
+			const data = docSnap.data() as User
+			return data.name
+		}
+
+		return null
+	} catch (e) {
+		console.debug("[FIRESTORE] getStaffNameById:", e)
+		return null
+	}
+}

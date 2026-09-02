@@ -6,10 +6,43 @@ import Fuse from "fuse.js"
 
 import ThemedIcon from "../components/ui/ThemedIcon"
 import ThemedText from "../components/ui/ThemedText"
+import RiskCard from "../components/RiskCard"
 
 import { Theme } from "../utils/theme"
-import RiskCard from "../components/RiskCard"
 import { getAllRisks } from "../lib/firebase/firestore/risks"
+import { LangDBList } from "../lib/constants"
+
+const trDB: Record<string, string> = LangDBList.tr
+const enDB: Record<string, string> = LangDBList.en
+
+interface SearchableRisk {
+	risk: Risk
+	type: string
+	severity: string
+	status: string
+	location: string
+	category: string
+	description: string
+	createdBy: string
+}
+
+function bilingualSearchValue(value: string): string {
+	const aliases = [value, trDB[value], enDB[value]].filter((v): v is string => Boolean(v))
+	return [...new Set(aliases)].join(" ")
+}
+
+function toSearchableRisk(risk: Risk): SearchableRisk {
+	return {
+		risk,
+		type: bilingualSearchValue(risk.type),
+		severity: bilingualSearchValue(risk.severity),
+		status: bilingualSearchValue(risk.status),
+		location: bilingualSearchValue(risk.location),
+		category: bilingualSearchValue(risk.category),
+		description: risk.description,
+		createdBy: risk.createdBy,
+	}
+}
 
 export default function SearchScreen() {
 	const navigation = useNavigation<any>()
@@ -18,7 +51,7 @@ export default function SearchScreen() {
 
 	const styles = createStyles(darkMode)
 
-	const [members, setMembers] = useState<Risk[]>([])
+	const [risks, setRisks] = useState<Risk[]>([])
 	const [search, setSearch] = useState(route.params?.search || "")
 	const [debouncedQuery, setDebouncedQuery] = useState("")
 
@@ -38,15 +71,14 @@ export default function SearchScreen() {
 		navigation.navigate("RisksScreen")
 	}
 
-	const fetchMembers = useCallback(async () => {
-		console.debug("[SearchScreen] fetchMembers")
-		const fetchedMembers = await getAllRisks()
-		setMembers(fetchedMembers)
+	const fetchRisks = useCallback(async () => {
+		const fetchedRisks = await getAllRisks()
+		setRisks(fetchedRisks)
 	}, [])
 
 	useEffect(() => {
-		fetchMembers()
-	}, [fetchMembers])
+		fetchRisks()
+	}, [fetchRisks])
 
 	useEffect(() => {
 		if (timerRef.current) clearTimeout(timerRef.current)
@@ -59,20 +91,21 @@ export default function SearchScreen() {
 	}, [search])
 
 	const fuse = useMemo(() => {
-		if (members) {
-			return new Fuse(members, {
+		if (risks && risks.length > 0) {
+			return new Fuse(risks.map(toSearchableRisk), {
 				keys: ["type", "severity", "status", "description", "createdBy", "location", "category"],
 				threshold: 0.3,
+				ignoreLocation: true,
 			})
 		} else {
 			return new Fuse([], {})
 		}
-	}, [members])
+	}, [risks])
 
 	const filtered = useMemo(() => {
 		if (!debouncedQuery.trim()) return []
 		searchRef.current = search
-		return fuse.search(debouncedQuery).map((r) => r.item)
+		return fuse.search(debouncedQuery).map((r) => r.item.risk)
 	}, [debouncedQuery, fuse])
 
 	const renderItem = useCallback(({ item }: { item: Risk }) => {
