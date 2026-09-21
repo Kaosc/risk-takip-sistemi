@@ -141,17 +141,6 @@ export default function RiskCard({ item }: { item: Risk }) {
 						</ThemedText>
 					</View>
 				</View>
-
-				<ThemedText
-					style={{
-						fontSize: 12,
-						fontWeight: "600",
-						opacity: 0.5,
-						textAlign: "right",
-					}}
-				>
-					{item.id}
-				</ThemedText>
 			</View>
 		</TouchableOpacity>
 	)

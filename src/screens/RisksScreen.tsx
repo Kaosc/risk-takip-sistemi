@@ -201,7 +201,7 @@ export default function RisksScreen({
 							color={typeFilter ? activeColor : undefined}
 						/>
 						<ThemedText style={[styles.filterButtonText, typeFilter && styles.filterButtonTextActive]}>
-							{typeFilter ? t(typeFilter) : "Durum"}
+							{statusFilter ? t(statusFilter) : "Durum"}
 						</ThemedText>
 					</TouchableOpacity>
 				</View>
